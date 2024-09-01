@@ -23,7 +23,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
         <div className="flex flex-col relative">
           <div className="absolute h-64 bg-secondar left-0 top-0 inset-x-0 z-[-1]"></div>
           <Header />
-          <main className="flex flex-1 flex-col container p-4 md:p-6 overflow-x-hidden">
+          <main className="flex flex-1 flex-col container p-4 md:p-6">
             {children}
           </main>
         </div>

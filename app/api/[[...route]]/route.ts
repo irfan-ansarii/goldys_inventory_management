@@ -13,7 +13,6 @@ import productsHandler from "@/app/api/routes/products";
 import transfersHandler from "@/app/api/routes/transfers";
 import adjustmentsHandler from "@/app/api/routes/adjustments";
 import barcodesHandler from "@/app/api/routes/barcodes";
-
 import ordersHandler from "@/app/api/routes/orders";
 import purchaseHandler from "@/app/api/routes/purchase";
 import expensesHandler from "@/app/api/routes/expenses";

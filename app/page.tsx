@@ -1,4 +1,3 @@
-import OneTimePassEmail from "@/emails/one-time-password";
 import PasswordReset from "@/emails/password-reset";
 import { render } from "@react-email/components";
 
