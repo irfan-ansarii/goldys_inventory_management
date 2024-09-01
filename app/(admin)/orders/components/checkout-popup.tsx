@@ -1,4 +1,5 @@
 "use client";
+import Lottie from "react-lottie";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -10,7 +11,6 @@ import PaymentTab from "./payment-tab";
 import InvoiceTab from "./invoice-tab";
 import NotesTab from "./notes-tab";
 import * as animationData from "@/public/animation-confetti.json";
-import Lottie from "react-lottie";
 
 export type CreatedOrdertype = {
   id: number;

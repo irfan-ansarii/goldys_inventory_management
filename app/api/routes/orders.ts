@@ -321,6 +321,8 @@ const app = new Hono()
           taxLines = [{ name: "IGST", amount: formatValue(item.tax!) }];
         }
 
+        const fulfilled = (item.quantity || 0) - (item.shippingQuantity || 0);
+
         const lineItemData = {
           ...item,
           discount: item.discount || undefined,
@@ -328,7 +330,9 @@ const app = new Hono()
           tax: formatValue(item.tax!),
           orderId: orderId,
           quantity: item.lineItemId ? item.quantity : item.currentQuantity,
-          shippingQuantity: item.requiresShipping ? item.currentQuantity : 0,
+          shippingQuantity: item.requiresShipping
+            ? item.currentQuantity! - fulfilled
+            : 0,
         };
 
         if (lineItemData.lineItemId) {

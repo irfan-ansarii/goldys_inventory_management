@@ -16,29 +16,31 @@ const paths = [
 const StatusNav = () => {
   const { queryParams, searchParamsObj } = useRouterStuff();
   return (
-    <div className="flex rounded-md bg-secondary ga1 p-1 mb-6 flex-nowrap overflow-auto">
-      {paths.map((path) => (
-        <Link
-          key={path.value}
-          href={
-            queryParams({
-              set: { status: path.value },
-              getNewPath: true,
-            }) as string
-          }
-          className={buttonVariants({
-            variant:
-              (searchParamsObj.status || "") === path.value
-                ? "outline"
-                : "ghost",
-            size: "sm",
-            className:
-              "border-none !whitespace-normal flex-[0_0_auto] min-h-0 flex-nowrap overflow-hidden",
-          })}
-        >
-          {path.label}
-        </Link>
-      ))}
+    <div className="overflow-hidden">
+      <div className="flex rounded-md bg-secondary gap-1 p-1 mb-6 flex-nowrap overflow-x-auto">
+        {paths.map((path) => (
+          <Link
+            key={path.value}
+            href={
+              queryParams({
+                set: { status: path.value },
+                getNewPath: true,
+              }) as string
+            }
+            className={buttonVariants({
+              variant:
+                (searchParamsObj.status || "") === path.value
+                  ? "outline"
+                  : "ghost",
+              size: "sm",
+              className:
+                "border-none !whitespace-normal flex-[0_0_7rem] flex-nowrap",
+            })}
+          >
+            {path.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };

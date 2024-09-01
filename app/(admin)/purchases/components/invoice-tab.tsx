@@ -4,7 +4,6 @@ import { ChevronRight, Download, Eye, Plus } from "lucide-react";
 
 import Lottie from "react-lottie";
 import * as animationData from "@/public/animation.json";
-import * as animationDat from "@/public/animation-confetti.json";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -17,17 +16,8 @@ interface Props {
 const InvoiceTab = ({ order, onNext }: Props) => {
   const defaultOptions = {
     loop: false,
-    autoplay: true,
+    autoplay: false,
     animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
-  const defaultOption = {
-    loop: true,
-    autoplay: true,
-    animationData: animationDat,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
@@ -39,10 +29,9 @@ const InvoiceTab = ({ order, onNext }: Props) => {
 
   return (
     <div className="relative">
-      <Lottie options={defaultOptions} height={160} width={160} />
-      <div className="absolute w-full [&>*]:w-full [&>*]:h-full -top-20">
-        <Lottie options={defaultOption} />
-      </div>
+      <span className="-mt-10">
+        <Lottie options={defaultOptions} height={160} width={160} />
+      </span>
       <div className="h-full overflow-y-auto relative z-10">
         <div className="text-center space-y-1">
           <DialogTitle className="text-xl">Purchase Order Created!</DialogTitle>

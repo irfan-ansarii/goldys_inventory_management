@@ -13,6 +13,7 @@ import Popup from "@/components/custom-ui/popup";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const OrderCart = ({
   className,
@@ -47,7 +48,16 @@ const OrderCart = ({
   };
 
   const handleMinus = (index: number) => {
-    const { currentQuantity, quantity } = cartLineItems[index];
+    const { currentQuantity, quantity, requiresShipping, shippingQuantity } =
+      cartLineItems[index];
+
+    // TODO fix quantity issues
+    const fulfilled = (quantity || 0) - (shippingQuantity || 0);
+
+    if (currentQuantity === fulfilled) {
+      toast.info("Fulfilled item(s) could not be removed.");
+      return;
+    }
 
     if (quantity && currentQuantity === 1) {
       setValue(`lineItems.${index}.currentQuantity`, 0);

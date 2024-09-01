@@ -4,6 +4,7 @@ import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
+
 import Provider from "@/components/provider";
 import { ReactQueryProvider } from "@/components/react-query-provider";
 import { siteConfig } from "@/lib/utils";
