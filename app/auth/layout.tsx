@@ -1,10 +1,7 @@
 import Image from "next/image";
 
-import { nanoid } from "nanoid";
-
 function AuthLayout({ children }: { children: React.ReactNode }) {
-  const id = nanoid();
-  const src = `https://api.dicebear.com/8.x/shapes/svg?seed=${id}`;
+  const src = `https://api.dicebear.com/8.x/shapes/svg?seed=1`;
 
   return (
     <div className="w-full lg:grid h-screen lg:grid-cols-2">
