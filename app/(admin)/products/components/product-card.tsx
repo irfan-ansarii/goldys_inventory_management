@@ -98,7 +98,7 @@ const ProductCard = ({ product }: { product: ProductType }) => {
                 <p>▪</p>
                 <Tooltip
                   content={
-                    <div className="flex gap-2 w-44">
+                    <div className="flex gap-2 w-44 flex-wrap">
                       {product.variants?.map((v) => (
                         <Badge variant="secondary" key={v.id} className="py-0">
                           {v.title}

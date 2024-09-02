@@ -1,11 +1,9 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Tooltip from "./custom-ui/tooltip";
-import { useRouterStuff } from "@/hooks/use-router-stuff";
 
 export interface Pagination {
   page: number;
@@ -16,15 +14,14 @@ export interface Pagination {
 
 interface PaginationProps {
   meta: Pagination;
+  onChange: (p: number) => void;
 }
 
-const Pagination = ({ meta }: PaginationProps) => {
+const Pagination = ({ meta, onChange }: PaginationProps) => {
   const { page, size, pages, total } = meta;
 
   const startItem = (page - 1) * size + 1;
   const endItem = Math.min(page * size, total);
-
-  const { queryParams } = useRouterStuff();
 
   if (!total || total == 0) return;
 
@@ -41,17 +38,13 @@ const Pagination = ({ meta }: PaginationProps) => {
             </Button>
           ) : (
             <Tooltip content="Previous">
-              <Link
-                href={
-                  queryParams({
-                    set: { page: `${Math.max(page - 1, 1)}` },
-                    getNewPath: true,
-                  }) as string
-                }
-                className={buttonVariants({ variant: "outline", size: "sm" })}
+              <Button
+                onClick={() => onChange(Math.max(page - 1, 1))}
+                variant="outline"
+                size="sm"
               >
                 <ChevronLeft className="w-4 h-4" />
-              </Link>
+              </Button>
             </Tooltip>
           )}
 
@@ -63,21 +56,13 @@ const Pagination = ({ meta }: PaginationProps) => {
             </Button>
           ) : (
             <Tooltip content="Next">
-              <Link
-                href={
-                  queryParams({
-                    set: { page: `${Math.min(page + 1, pages)}` },
-                    getNewPath: true,
-                  }) as string
-                }
-                className={buttonVariants({
-                  variant: "outline",
-                  size: "sm",
-                  className: "px-",
-                })}
+              <Button
+                onClick={() => onChange(Math.min(page + 1, pages))}
+                variant="outline"
+                size="sm"
               >
                 <ChevronRight className="w-4 h-4" />
-              </Link>
+              </Button>
             </Tooltip>
           )}
         </div>

@@ -125,7 +125,7 @@ export const useDeleteProduct = (id: any) => {
   });
 };
 
-export const useGetVariants = (query: Record<string, string>) => {
+export const useGetVariants = (query: Record<string, any>) => {
   return useQuery<GetResponseType, Error>({
     queryKey: ["variants", query],
     queryFn: async () => {

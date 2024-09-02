@@ -34,8 +34,8 @@ const app = new Hono()
     }
 
     const jobStatus = limiter.jobStatus(`${webhookOrder.id}`);
-
-    if (jobStatus !== "DONE") {
+    console.log(jobStatus);
+    if (jobStatus && jobStatus !== "DONE") {
       console.log("Job is already in the queue skipping...");
       return;
     }

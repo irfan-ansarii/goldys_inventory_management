@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { z } from "zod";
+import { usePathname } from "next/navigation";
+import { Search, ShoppingBag } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   lineItemCreateSchema,
@@ -9,8 +10,6 @@ import {
 } from "@/drizzle/schemas/orders";
 import { useForm, useWatch } from "react-hook-form";
 import { useGetVariants } from "@/query/products";
-
-import { Search, ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,6 +25,7 @@ import OrderCart from "../components/order-cart";
 import ProductCard from "../components/product-card";
 import CustomItemPopup from "../components/custom-item-popup";
 import useLocalStorage from "@/hooks/use-local-storage";
+import { toast } from "sonner";
 
 const lineItemSchema = lineItemCreateSchema
   .omit({
@@ -83,10 +83,15 @@ type WatchProps = [string, string, string, string, string, string, string];
 const OrderForm = ({ defaultValues }: any) => {
   const pathname = usePathname();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  const [progress, setProgress] = useState<
+    (EventTarget & HTMLInputElement) | null
+  >(null);
 
   const [cloneData, clearCloneData] = useLocalStorage("clone_data");
 
-  const { data, isLoading, isError } = useGetVariants({ q: search });
+  const { data, isLoading, isError } = useGetVariants({ q: search, page });
 
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(schema),
@@ -172,9 +177,38 @@ const OrderForm = ({ defaultValues }: any) => {
     });
   };
 
+  // check if item is in cart to show active
   const isItemInCart = (id: number): boolean => {
     return cartLineItems.findIndex((i) => i.variantId === id) !== -1;
   };
+
+  /** hanlde product search */
+  const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const { key, currentTarget } = e;
+    const { value } = currentTarget;
+
+    if (key !== "Enter" || !value) return;
+    if (progress) {
+      toast.loading("Please wait...", { id: "toast" });
+      return;
+    }
+    if (isLoading) setProgress(currentTarget);
+  };
+
+  useEffect(() => {
+    if (!isLoading && progress) {
+      const found = data?.data.find((item) => item.barcode === progress.value);
+
+      if (found) {
+        toast.success("Product found", { id: "toast" });
+      } else {
+        toast.error("Product not found", { id: "toast" });
+      }
+      progress.value = "";
+      console.log("progress clered");
+      setProgress(null);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     calculateCart();
@@ -203,6 +237,7 @@ const OrderForm = ({ defaultValues }: any) => {
                 className="pl-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={handleSearch}
               />
               {/* custom item popup */}
               <CustomItemPopup calculateCart={calculateCart} />
@@ -227,7 +262,7 @@ const OrderForm = ({ defaultValues }: any) => {
             )}
           </div>
           {/* pagination */}
-          {data && <Pagination meta={data.meta} />}
+          {data && <Pagination meta={data.meta} onChange={setPage} />}
         </div>
 
         <div className="col-span-2 hidden lg:block">

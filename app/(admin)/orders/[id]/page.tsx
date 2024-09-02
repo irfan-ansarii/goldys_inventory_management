@@ -77,7 +77,7 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
             <CardHeader>
               <CardTitle className="text-base">Processing</CardTitle>
             </CardHeader>
-            <CardContent className="divide-y">
+            <CardContent className="divide-y !pt-0">
               {processing.map((item, i) => (
                 <ProductItem key={i} item={item} />
               ))}

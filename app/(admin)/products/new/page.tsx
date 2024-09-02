@@ -218,7 +218,7 @@ const NewProductPage = () => {
               )}
             />
           </Card>
-          <Card className="p4 md:p-6 space-y-6">
+          <Card className="space-y-6 p-4 md:p-6">
             <CardTitle className="text-lg">Product Image</CardTitle>
 
             <div className="relative aspect-square rounded-md overflow-hidden">
