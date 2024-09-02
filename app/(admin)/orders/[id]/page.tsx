@@ -12,13 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import ProductItem from "../components/product-item";
 
@@ -63,7 +63,7 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
             <CardHeader>
               <CardTitle className="text-base">Products</CardTitle>
             </CardHeader>
-            <CardContent className="divide-y">
+            <CardContent className="divide-y !pt-0">
               {products.map((item, i) => (
                 <ProductItem key={i} item={item} />
               ))}

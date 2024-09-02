@@ -29,15 +29,23 @@ const app = new Hono()
       topic === "orders/updated" && webhookOrder.fulfillment_status !== null;
 
     if (isFulfilled) {
-      throw new HTTPException(400, { message: "Fulfilled order skipping..." });
+      console.log("Fulfilled order skipping...");
+      return;
+    }
+
+    const jobStatus = limiter.jobStatus(`${webhookOrder.id}`);
+
+    if (jobStatus !== "DONE") {
+      console.log("Job is already in the queue skipping...");
+      return;
     }
 
     if (topic === "orders/create") {
-      limiter.schedule({ priority: 1 }, () =>
+      limiter.schedule({ priority: 5, id: `${webhookOrder.id}` }, () =>
         handleWebhhokOrder({ data: webhookOrder, store, topic: "create" })
       );
     } else if (topic === "orders/updated") {
-      limiter.schedule({ priority: 2 }, () =>
+      limiter.schedule({ priority: 9, id: `${webhookOrder.id}` }, () =>
         handleWebhhokOrder({ data: webhookOrder, store, topic: "update" })
       );
     }

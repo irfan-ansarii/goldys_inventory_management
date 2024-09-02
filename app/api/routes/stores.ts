@@ -29,10 +29,11 @@ const app = new Hono()
     const { role } = c.get("jwtPayload");
 
     if (role !== "admin")
-      throw new HTTPException(403, { message: "Forbidden" });
+      throw new HTTPException(403, { message: "Permisson denied" });
 
     const store = await createStore(data);
 
+    // TODO create options and inventories
     return c.json({ success: true, data: store }, 201);
   })
 
@@ -53,11 +54,11 @@ const app = new Hono()
     const { id: userId, role } = c.get("jwtPayload");
 
     if (role !== "admin")
-      throw new HTTPException(403, { message: "Forbidden" });
+      throw new HTTPException(403, { message: "Permission denied" });
 
     const response = await getStore(id);
 
-    if (!response) throw new HTTPException(404, { message: "Not Found" });
+    if (!response) throw new HTTPException(404, { message: "Store not found" });
 
     await updateUser(userId, { storeId: id });
 
@@ -106,13 +107,15 @@ const app = new Hono()
     const { token } = data;
 
     const store = await getStore(id);
-    let tempToken = store.token;
 
+    // channel access token
+    let tempToken = store.token;
     if (!token?.startsWith("•") && token?.length! > 10) {
       tempToken = token!;
     }
+
     if (role !== "admin")
-      throw new HTTPException(403, { message: "Forbidden" });
+      throw new HTTPException(403, { message: "Permission denied" });
 
     const result = await updateStore(id, { ...data, token: tempToken });
 

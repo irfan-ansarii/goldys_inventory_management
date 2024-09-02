@@ -67,11 +67,11 @@ const app = new Hono()
     let response = await getOption(key, storeId);
 
     if (!response) {
-      throw new HTTPException(404, { message: "Not Found" });
+      throw new HTTPException(404, { message: "Config not found" });
     }
 
     if (!DELETE_ROLES.includes(role)) {
-      throw new HTTPException(403, { message: "Forbidden" });
+      throw new HTTPException(403, { message: "Permisson denied" });
     }
 
     response = await deleteOption(key);

@@ -131,5 +131,5 @@ export const EXPENSE_CATEGORIES = [
 
 export const limiter = new Bottleneck({
   maxConcurrent: 1, // maximum concurrent requests
-  minTime: 1000, // minimum time between requests in ms
+  minTime: 2000, // minimum time between requests in ms
 });

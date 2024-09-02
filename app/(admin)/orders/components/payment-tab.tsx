@@ -200,7 +200,7 @@ const PaymentTab = ({ order, onNext, showSkip = true }: Props) => {
 
         <div className="flex [&>*]:flex-1 gap-2">
           {showSkip && (
-            <Button onClick={() => onNext()} type="button">
+            <Button onClick={() => onNext()} type="button" variant="outline">
               Skip
             </Button>
           )}

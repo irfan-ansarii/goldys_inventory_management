@@ -121,6 +121,7 @@ const Actions = ({ order, type }: { order: OrderType; type?: string }) => {
               variant="ghost"
               size="sm"
               onClick={() => handleInvoice("send")}
+              disabled
             >
               <Mail className="w-4 h-4 mr-2" />
               Send Invoice

@@ -16,14 +16,11 @@ import * as React from "react";
 
 interface VercelInviteUserEmailProps {
   username: string;
-
   otp: string;
   email: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? `https://${process.env.NEXT_PUBLIC_APP_URL}`
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 export const OneTimePassword = ({
   username,
@@ -39,7 +36,7 @@ export const OneTimePassword = ({
           <Container className="border border-solid border-[#eaeaea] rounded-lg my-[40px] mx-auto p-[30px] max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={"/logo.png"}
+                src={`${baseUrl}/logo.png`}
                 height="40"
                 alt="Vercel"
                 className="my-0"

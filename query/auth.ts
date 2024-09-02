@@ -41,7 +41,7 @@ export const useSignin = () => {
   return useMutation<SigninResponseType, Error, SigninRequestType>({
     mutationFn: async (json) => {
       const response = await client.api.auth.signin.$post({ json });
-
+      console.log(response);
       const jsonResponse = await response.json();
 
       if (!jsonResponse.success) throw jsonResponse;

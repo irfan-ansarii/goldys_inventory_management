@@ -27,7 +27,6 @@ const app = new Hono().basePath("/api");
 app.use("*", cors());
 
 const routes = app
-
   .route("/auth", authHandler)
   .route("/webhooks", webhookHandler)
   .all("/*", jwt({ secret: "secret" }))
@@ -60,8 +59,8 @@ const routes = app
   });
 
 export const GET = handle(app);
+export const POST = handle(app);
 export const PUT = handle(app);
 export const DELETE = handle(app);
-export const POST = handle(app);
 
 export type AppType = typeof routes;

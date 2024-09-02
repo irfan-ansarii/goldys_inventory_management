@@ -9,7 +9,7 @@ const ProductItem = ({ item }: { item: any }) => {
   const isRemoved = item.currentQuantity === 0;
 
   return (
-    <div className="flex gap-2 py-2 first:pt-0 last:pb-0">
+    <div className="flex gap-4 py-2 first:pt-0 last:pb-0">
       <Avatar src={item.image || item.title} />
       <div
         className={`grid grid-cols-2 md:grid-cols-5 flex-1 gap-2 ${
@@ -41,7 +41,6 @@ const ProductItem = ({ item }: { item: any }) => {
                 </Button>
               </Tooltip>
             ))}
-            <span>{item.shippingQuantity}</span>
           </div>
         </div>
         <div className="space-x-3">

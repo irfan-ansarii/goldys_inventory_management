@@ -10,7 +10,10 @@ import { createUser, getUser } from "@/drizzle/services/users";
 import { getVariantsProduct } from "@/drizzle/services/products";
 import { formatValue, getOrderStatus } from "./utils";
 import { parseISO } from "date-fns";
-import { createAdminRestApiClient } from "@shopify/admin-api-client";
+import {
+  createAdminRestApiClient,
+  AdminRestApiClient,
+} from "@shopify/admin-api-client";
 
 interface ShippingLine {
   reason: string;
@@ -146,42 +149,34 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
    * Handle Transactions
    ********************/
 
-  let success = false;
-  while (!success) {
-    try {
-      const res = await client.get(`orders/${data.id}/transactions`);
+  const [txns, appTxns] = await Promise.all([
+    getChannelTransactions(client, data.id),
+    getTransactions(orderEntity?.id),
+  ]);
 
-      if (res.ok) {
-        const { transactions } = (await res.json()) as {
-          transactions: Record<string, any>[];
-        };
+  if (txns && appTxns) {
+    const paymentIds = new Set(appTxns.map((txn) => txn.paymentId));
 
-        const appTxns = await getTransactions(orderEntity?.id);
-        const paymentIds = new Set(appTxns.map((txn) => txn.paymentId));
+    const createTransactionsData = txns
+      .filter(
+        (txn) =>
+          (txn.kind === "sale" || txn.kind === "refund") &&
+          txn.status === "success" &&
+          !paymentIds.has(txn.id)
+      )
+      .map((txn) => ({
+        storeId: store.id,
+        orderId: orderEntity?.id,
+        name: txn.gateway
+          .replace("gift_card", "Gift Card")
+          .replace(/Razorpay.*/i, "Razorpay"),
+        kind: txn.kind,
+        amount: txn.amount,
+        paymentId: txn.id,
+      }));
 
-        const createTransactionsData = transactions
-          .filter(
-            (txn) =>
-              (txn.kind === "sale" || txn.kind === "refund") &&
-              txn.status === "success" &&
-              !paymentIds.has(txn.id)
-          )
-          .map((txn) => ({
-            storeId: store.id,
-            orderId: orderEntity?.id,
-            name: txn.gateway.replace("gift_card", "Gift Card"),
-            kind: txn.kind,
-            amount: txn.amount,
-            paymentId: txn.id,
-          }));
-
-        if (createTransactionsData.length > 0)
-          await createTransactions(createTransactionsData);
-
-        success = true; // Mark success to exit the loop
-      }
-    } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (createTransactionsData.length > 0) {
+      await createTransactions(createTransactionsData);
     }
   }
 
@@ -196,7 +191,7 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
     due,
   });
 
-  // return realy if topic is update
+  // return ealy if topic is update do not create line items
   if (action === "update") {
     return new Promise((res) => res(true));
   }
@@ -207,6 +202,8 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
   const createLineItemsData = [];
   for (const line of line_items) {
     const {
+      product_id,
+      product_exists,
       title,
       variant_title,
       sku,
@@ -220,10 +217,16 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
     } = line;
 
     let variant;
-
     if (sku) {
       variant = await getVariantsProduct({ q: sku });
       variant = variant.data?.[0];
+    }
+
+    let image: string = "";
+
+    // get product image
+    if (!variant && product_id && product_exists) {
+      image = await getChannelProductImages(client, product_id);
     }
 
     const { taxLines, tax } = tax_lines.reduce(
@@ -248,7 +251,7 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
       variantId: variant?.id,
       title,
       variantTitle: variant_title,
-      image: variant?.product?.image,
+      image: variant?.product?.image || image,
       barcode: variant?.barcode,
       sku,
       hsn: "",
@@ -321,4 +324,55 @@ const formatAddress = (args: any) => {
     phone,
     email,
   ];
+};
+
+const getChannelTransactions = async (
+  client: AdminRestApiClient,
+  orderId: string | number
+) => {
+  let success = false;
+  let transactions: Record<string, any>[] = [];
+
+  while (!success) {
+    try {
+      const res = await client.get(`orders/${orderId}/transactions`);
+
+      if (res.ok) {
+        const data = (await res.json()) as {
+          transactions: Record<string, any>[];
+        };
+        transactions = data.transactions;
+        success = true;
+      }
+    } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+
+  return transactions;
+};
+
+const getChannelProductImages = async (
+  client: AdminRestApiClient,
+  productId: string | number
+) => {
+  let image = "";
+  let success = false;
+  while (!success) {
+    try {
+      const res = await client.get(`products/${productId}/images`);
+
+      if (res.ok) {
+        const { images } = (await res.json()) as {
+          images: Record<string, any>[];
+        };
+        if (images.length > 0) image = images[0].src;
+
+        success = true;
+      }
+    } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+  return image;
 };

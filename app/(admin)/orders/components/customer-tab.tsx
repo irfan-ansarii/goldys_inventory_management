@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { ArrowLeft, ArrowRight, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +18,7 @@ import { UserType, useUsersData } from "@/query/users";
 
 import Avatar from "@/components/custom-ui/avatar";
 import PopupLoading from "@/components/popup-loading";
+import UserPopup from "../../contacts/components/user-popup";
 
 interface Props {
   onPrev: () => void;
@@ -30,6 +31,7 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
   const disabled = !form.watch("customerId");
 
   const [search, setSearch] = useState("");
+
   const { data, isLoading } = useUsersData({ roles: ["customer"], q: search });
 
   const handleCustomer = (selected: UserType) => {
@@ -58,6 +60,8 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
 
     form.setValue("billing", billing);
     form.setValue("shipping", billing);
+    setSearch(selected.phone!);
+    onNext();
   };
 
   return (
@@ -75,6 +79,31 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        <UserPopup
+          defaultValue={{
+            name: "",
+            phone: search,
+            email: "",
+            role: "customer",
+            address: {
+              address: "",
+              city: "",
+              state: "",
+              pincode: "",
+              gstin: "",
+            },
+          }}
+          callback={handleCustomer}
+        >
+          <Button
+            className="absolute right-0 inset-y-0"
+            size="icon"
+            variant="ghost"
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+        </UserPopup>
       </div>
 
       <div className="h-full overflow-y-scroll">
@@ -92,7 +121,6 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
                 <RadioGroup
                   onValueChange={(e) => {
                     field.onChange(e);
-                    onNext();
                   }}
                   defaultValue={field.value}
                   className="gap-2"
@@ -107,7 +135,7 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
                         <div className="flex items-center gap-2 truncate">
                           <Avatar src={user.name} />
 
-                          <div className="space-y-1.5 truncate leading-tight">
+                          <div className="space-y-1 truncate leading-tight">
                             <p>{user.name}</p>
                             <div className="flex gap-2 font-normal text-muted-foreground truncate">
                               <p className="truncate">{user.phone}</p>
@@ -131,7 +159,7 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
         />
       </div>
       <div className="flex [&>*]:flex-1 gap-2">
-        <Button type="button" onClick={onPrev}>
+        <Button type="button" onClick={onPrev} variant="outline">
           <ArrowLeft className="w-4 h-4 mr-1" />
           Prev
         </Button>

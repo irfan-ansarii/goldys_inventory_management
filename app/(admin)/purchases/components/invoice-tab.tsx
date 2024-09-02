@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ChevronRight, Download, Eye, Plus } from "lucide-react";
+import { ChevronRight, Eye, Plus } from "lucide-react";
 
 import Lottie from "react-lottie";
 import * as animationData from "@/public/animation.json";
@@ -23,10 +23,6 @@ const InvoiceTab = ({ order, onNext }: Props) => {
     },
   };
 
-  const handleClick = (action: string) => {
-    console.log("action is: ", action);
-  };
-
   return (
     <div className="relative">
       <span className="-mt-10">
@@ -42,26 +38,6 @@ const InvoiceTab = ({ order, onNext }: Props) => {
         </div>
 
         <div className="space-y-2 mt-10">
-          <Button
-            className="h-auto w-full px-2"
-            variant="outline"
-            onClick={() => handleClick("download")}
-          >
-            <div className="flex gap-3 overflow-hidden">
-              <span className="w-10 h-10 inline-flex items-center justify-center bg-secondary rounded-full flex-none">
-                <Download className="w-4 h-4" />
-              </span>
-              <div className="text-left truncate">
-                <p className="font-medium">Download Invoice</p>
-                <DialogDescription className="truncate">
-                  Get a digital copy of the invoice
-                </DialogDescription>
-              </div>
-            </div>
-            <span className="ml-auto">
-              <ChevronRight className="w-4 h-4" />
-            </span>
-          </Button>
           <Link
             className={buttonVariants({
               variant: "outline",

@@ -50,7 +50,7 @@ const InvoiceTab = ({ order, onNext }: Props) => {
       <div className="h-full overflow-y-auto relative z-10 -mt-10">
         <div className="text-center space-y-1">
           <DialogTitle className="text-xl">Order Created!</DialogTitle>
-          <p>
+          <p className="text-muted-foreground">
             Congratulations a new order has been <br />
             successfully created!
           </p>
@@ -60,6 +60,7 @@ const InvoiceTab = ({ order, onNext }: Props) => {
           <Button
             className="h-auto w-full px-2"
             variant="outline"
+            disabled
             onClick={() => handleClick("send")}
           >
             <div className="flex gap-3 overflow-hidden">
@@ -70,26 +71,6 @@ const InvoiceTab = ({ order, onNext }: Props) => {
                 <p className="font-medium">Email Invoice</p>
                 <DialogDescription className="truncate font-normal">
                   Send a digital copy of the invoice to customer
-                </DialogDescription>
-              </div>
-            </div>
-            <span className="ml-auto">
-              <ChevronRight className="w-4 h-4" />
-            </span>
-          </Button>
-          <Button
-            className="h-auto w-full px-2"
-            variant="outline"
-            onClick={() => handleClick("print")}
-          >
-            <div className="flex gap-3 overflow-hidden">
-              <span className="w-10 h-10 inline-flex items-center justify-center bg-secondary rounded-full flex-none">
-                <Printer className="w-4 h-4" />
-              </span>
-              <div className="text-left truncate">
-                <p className="font-medium">Print Invoice</p>
-                <DialogDescription className="truncate font-normal">
-                  Get a physical copy of the invoice
                 </DialogDescription>
               </div>
             </div>

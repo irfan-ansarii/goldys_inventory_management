@@ -218,6 +218,7 @@ const NotesTab = ({ onPrev, onNext }: Props) => {
           type="button"
           onClick={onPrev}
           disabled={isPending || isUpdating}
+          variant="outline"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Prev

@@ -35,13 +35,6 @@ const userSchema = userCreateSchema
       .optional(),
   });
 
-const userMeSchema = userCreateSchema.pick({
-  name: true,
-  phone: true,
-  email: true,
-  password: true,
-});
-
 const app = new Hono()
   /********************************************************************* */
   /**                             CREATE USER                            */
@@ -81,7 +74,8 @@ const app = new Hono()
   /**                              GET USERS                             */
   /********************************************************************* */
   .get("/", async (c) => {
-    const { roles, q } = c.req.queries();
+    const { roles } = c.req.queries();
+    const { q } = c.req.query();
 
     const results = await getUsers({
       roles,

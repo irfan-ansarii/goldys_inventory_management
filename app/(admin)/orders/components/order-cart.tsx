@@ -52,7 +52,10 @@ const OrderCart = ({
       cartLineItems[index];
 
     // TODO fix quantity issues
-    const fulfilled = (quantity || 0) - (shippingQuantity || 0);
+    let fulfilled = 0;
+    if (requiresShipping) {
+      fulfilled = (quantity || 0) - (shippingQuantity || 0);
+    }
 
     if (currentQuantity === fulfilled) {
       toast.info("Fulfilled item(s) could not be removed.");

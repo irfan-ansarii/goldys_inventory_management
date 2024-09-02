@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import Popup from "@/components/custom-ui/popup";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -25,7 +25,7 @@ import {
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateUser, useUpdateUser } from "@/query/users";
+import { useCreateUser, UserType, useUpdateUser } from "@/query/users";
 import { useRouter } from "next/navigation";
 
 const roles = [
@@ -39,7 +39,7 @@ const schema = z.object({
   storeId: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
   phone: z.string().length(10, { message: "Invalid phone" }),
-  email: z.string().email({ message: "Invalid email" }),
+  email: z.string().email({ message: "Invalid email" }).or(z.literal(``)),
   role: z.enum(["admin", "user", "customer", "supplier", "employee"]),
   address: z
     .object({
@@ -72,9 +72,11 @@ interface Props {
   children: React.ReactNode;
   defaultValue?: FormValue;
   defaultRoles?: typeof roles;
+  callback?: (p: UserType) => void;
 }
 
 const UserPopup: React.FC<Props> = ({
+  callback,
   children,
   defaultValue,
   defaultRoles,
@@ -94,6 +96,10 @@ const UserPopup: React.FC<Props> = ({
     const role = roles.find((role) => role.value === values.role);
     const { id, storeId, ...rest } = values;
 
+    if (!rest.email || rest.email === "") {
+      rest.email = `${rest.phone}@goldysnestt.com`;
+    }
+
     if (defaultValue?.id) {
       updateUser.mutate(rest, {
         onSuccess: () => {
@@ -103,7 +109,8 @@ const UserPopup: React.FC<Props> = ({
       });
     } else {
       createUser.mutate(rest, {
-        onSuccess: () => {
+        onSuccess: ({ data }) => {
+          callback?.(data);
           router.refresh();
           setOpen(false);
           form.reset();
@@ -111,6 +118,10 @@ const UserPopup: React.FC<Props> = ({
       });
     }
   };
+
+  useEffect(() => {
+    form.reset(defaultValue);
+  }, [defaultValue]);
 
   return (
     <Popup

@@ -19,9 +19,7 @@ interface VercelInviteUserEmailProps {
   email: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? `https://${process.env.NEXT_PUBLIC_APP_URL}`
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 export const PasswordReset = ({
   username,
@@ -36,7 +34,7 @@ export const PasswordReset = ({
           <Container className="border border-solid border-[#eaeaea] rounded-lg my-[40px] mx-auto p-[30px] max-w-[465px]">
             <Section className="pb-[22px]">
               <Img
-                src={"/logo.png"}
+                src={`${baseUrl}/logo.png`}
                 height="40"
                 alt="Vercel"
                 className="my-0"
