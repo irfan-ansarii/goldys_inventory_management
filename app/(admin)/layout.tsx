@@ -1,5 +1,4 @@
 import { getSession } from "@/query/users";
-
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";

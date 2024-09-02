@@ -1,7 +1,14 @@
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { getSession } from "@/query/users";
 
-function AuthLayout({ children }: { children: React.ReactNode }) {
-  const src = `https://api.dicebear.com/8.x/shapes/svg?seed=1`;
+const src = `https://api.dicebear.com/8.x/shapes/svg?seed=1`;
+async function AuthLayout({ children }: { children: React.ReactNode }) {
+  let session;
+  try {
+    session = await getSession();
+  } catch (error) {}
+  if (session) redirect("/dashboard");
 
   return (
     <div className="w-full lg:grid h-screen lg:grid-cols-2">

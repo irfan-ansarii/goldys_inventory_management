@@ -24,7 +24,7 @@ const Sidebar = async ({ className }: { className?: string }) => {
 
   return (
     <div className={cn("flex h-full max-h-screen flex-col gap-2", className)}>
-      <div className="flex items-center border-b px-5 pt-5">
+      <div className="flex items-center borderb px-5 pt-5">
         <Link
           className="flex w-full items-center gap-2 font-semibold relative h-[60px]"
           href="/dashboard"
