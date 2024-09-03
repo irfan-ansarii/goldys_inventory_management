@@ -39,7 +39,7 @@ const ShipmentCard = ({
 
   return (
     <Card>
-      <CardHeader className="border-b flex-row space-y-0">
+      <CardHeader className="border-b flex-row space-y-0 !pb-4 !md:pb-6">
         <div className="space-y-1.5 flex-1">
           <CardTitle className="text-base">
             <Badge
@@ -81,7 +81,7 @@ const ShipmentCard = ({
         <ShipmentActions shipment={shipment} />
       </CardHeader>
 
-      <CardContent className="divide-y pt-4 md:pt-6">
+      <CardContent className="divide-y">
         {shipment.lineItems.map((item, i) => (
           <ProductItem
             key={i}

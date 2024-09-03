@@ -63,7 +63,7 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
             <CardHeader>
               <CardTitle className="text-base">Products</CardTitle>
             </CardHeader>
-            <CardContent className="divide-y !pt-0">
+            <CardContent className="divide-y">
               {products.map((item, i) => (
                 <ProductItem key={i} item={item} />
               ))}
@@ -77,7 +77,7 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
             <CardHeader>
               <CardTitle className="text-base">Processing</CardTitle>
             </CardHeader>
-            <CardContent className="divide-y !pt-0">
+            <CardContent className="divide-y">
               {processing.map((item, i) => (
                 <ProductItem key={i} item={item} />
               ))}
@@ -114,7 +114,7 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
 
         {/* order totals */}
         <Card>
-          <CardContent className="px-6 py-4 [&>*]:py-1 [&>div]:flex [&>div]:justify-between">
+          <CardContent className="[&>*]:py-1 [&>div]:flex [&>div]:justify-between">
             <div>
               <span>Subtotal</span>
               <span>{formatNumber(order.subtotal)}</span>
