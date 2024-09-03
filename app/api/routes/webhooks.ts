@@ -14,7 +14,6 @@ const app = new Hono()
     const topic = c.req.header("x-shopify-topic");
     const domain = c.req.header("X-Shopify-Shop-Domain");
 
-    /** find store */
     const { data } = await getStores();
     const store = data.find((s) => s.domain === domain);
 
@@ -22,8 +21,6 @@ const app = new Hono()
       throw new HTTPException(400, { message: "Domain not found, skipping.." });
 
     const webhookOrder = await c.req.json();
-
-    console.log(webhookOrder.name, "-", "Event", topic);
 
     const isFulfilled =
       topic === "orders/updated" && webhookOrder.fulfillment_status !== null;
@@ -33,23 +30,16 @@ const app = new Hono()
       return;
     }
 
-    const jobStatus = limiter.jobStatus(`${webhookOrder.id}`);
-    console.log(jobStatus);
-    if (jobStatus && jobStatus !== "DONE") {
-      console.log("Job is already in the queue skipping...");
-      return;
-    }
+    limiter.schedule(() => handleWebhhokOrder({ data: webhookOrder, store }));
 
-    if (topic === "orders/create") {
-      limiter.schedule({ priority: 5, id: `${webhookOrder.id}` }, () =>
-        handleWebhhokOrder({ data: webhookOrder, store, topic: "create" })
-      );
-    } else if (topic === "orders/updated") {
-      limiter.schedule({ priority: 9, id: `${webhookOrder.id}` }, () =>
-        handleWebhhokOrder({ data: webhookOrder, store, topic: "update" })
-      );
-    }
+    console.log(`Scheduled ${topic} event for order ${webhookOrder.name}...`);
 
+    const counts = limiter.counts();
+
+    console.log("scheduler task::", counts);
+
+    const a = limiter.jobs();
+    console.log("jobs:", a);
     return c.json({ success: true }, 200);
   })
 

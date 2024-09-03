@@ -24,13 +24,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 flex flex-col gap-6">
         <div className="grid grid-cols-12 gap-6">
           <Card className="col-span-12 lg:col-span-3">
-            <CardContent className="p-6">
+            <CardContent className="p-4 md:p-6">
               <Navigations />
             </CardContent>
           </Card>
           <div className="col-span-12 lg:col-span-9">
             <Card>
-              <CardContent className="flex flex-col p-6">
+              <CardContent className="flex flex-col p-4 md:p-6">
                 {children}
               </CardContent>
             </Card>

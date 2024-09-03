@@ -15,7 +15,7 @@ const Navigation = () => {
   const pathname = usePathname();
 
   return (
-    <div className="inline-flex w-auto rounded-md bg-secondary gap-1 p-1 mb-6">
+    <div className="flex flex-nowrap rounded-md bg-secondary gap-1 p-1 mb-6 max-w-[calc(100vw-2rem)] overflow-auto">
       {paths.map((path) => (
         <Link
           key={path.href}
@@ -23,7 +23,7 @@ const Navigation = () => {
           className={buttonVariants({
             variant: pathname === path.href ? "outline" : "ghost",
             size: "sm",
-            className: "border-none truncate",
+            className: "border-none",
           })}
         >
           {path.label}

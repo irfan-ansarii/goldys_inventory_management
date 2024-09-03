@@ -16,7 +16,7 @@ const paths = [
 const StatusNav = () => {
   const { queryParams, searchParamsObj } = useRouterStuff();
   return (
-    <div className="flex flex-nowrap gap-2 overflow-x-auto w-full">
+    <div className="flex flex-nowrap gap-1 overflow-x-auto mb-6 bg-secondary rounded-md p-1 max-w-[calc(100vw-2rem)]">
       {paths.map((path) => (
         <Link
           key={path.value}
@@ -26,7 +26,14 @@ const StatusNav = () => {
               getNewPath: true,
             }) as string
           }
-          className="px-4"
+          className={buttonVariants({
+            variant:
+              (searchParamsObj.status || "") === path.value
+                ? "outline"
+                : "ghost",
+            size: "sm",
+            className: "",
+          })}
         >
           {path.label}
         </Link>
@@ -36,13 +43,3 @@ const StatusNav = () => {
 };
 
 export default StatusNav;
-
-// className={buttonVariants({
-//   variant:
-//     (searchParamsObj.status || "") === path.value
-//       ? "outline"
-//       : "ghost",
-//   size: "sm",
-//   className:
-//     "border-none !whitespace-normal flex-[0_0_7rem] flex-nowrap",
-// })}

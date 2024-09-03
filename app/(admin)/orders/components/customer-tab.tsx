@@ -35,6 +35,9 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
   const { data, isLoading } = useUsersData({ roles: ["customer"], q: search });
 
   const handleCustomer = (selected: UserType) => {
+    const id = form.getValues("customerId");
+    if (id === `${selected.id}`) return;
+
     const { name, phone, email, address: add } = selected;
     let billing = [name, phone, email];
 
@@ -42,24 +45,38 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
       const { address, city, state, pincode, gstin } = add as AddressType;
 
       const formattedStatePincode = `${state} - ${pincode}`;
-      const splitPoint = address.lastIndexOf(" ", 20);
-      const line1 = address.substring(0, splitPoint);
-      const line2 = address.substring(splitPoint + 1);
-      const formattedAddress = `${line1} ${line2}`;
+      let formattedAddress = [];
+
+      let remainingAddress = address.trim();
+
+      while (remainingAddress.length > 20) {
+        const splitPoint = remainingAddress.lastIndexOf(" ", 20);
+        const line =
+          splitPoint === -1
+            ? remainingAddress.substring(0, 20)
+            : remainingAddress.substring(0, splitPoint);
+        formattedAddress.push(line);
+        remainingAddress =
+          splitPoint === -1
+            ? remainingAddress.substring(20)
+            : remainingAddress.substring(splitPoint + 1);
+      }
 
       billing = [
         name,
-        formattedAddress,
+        ...formattedAddress,
         city,
         formattedStatePincode,
         phone,
         email,
       ];
+
       if (gstin) billing.push(`GSTIN: ${gstin}`);
     }
 
     form.setValue("billing", billing);
     form.setValue("shipping", billing);
+    form.setValue("customerId", selected.id);
     setSearch(selected.phone!);
     onNext();
   };

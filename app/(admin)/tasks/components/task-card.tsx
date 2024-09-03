@@ -9,7 +9,7 @@ import { TaskType } from "@/query/tasks";
 const TaskCard = ({ task }: { task: TaskType }) => {
   return (
     <Card className="hover:border-foreground transition duration-500">
-      <CardContent className="flex gap-4 p-4">
+      <CardContent className="flex gap-4 p-4 md:p-6">
         <div
           className={`${getTaskBadgeClassNames(task.status)} w-1 rounded-full`}
         ></div>

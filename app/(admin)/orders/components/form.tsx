@@ -1,31 +1,23 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { z } from "zod";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   lineItemCreateSchema,
   orderCreateSchema,
 } from "@/drizzle/schemas/orders";
 import { useForm, useWatch } from "react-hook-form";
-import { useGetVariants } from "@/query/products";
+import useLocalStorage from "@/hooks/use-local-storage";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 
 import Popup from "@/components/custom-ui/popup";
-import Pagination from "@/components/pagination";
-import SkeletonLoading from "@/components/skeleton-loading";
-import ErrorFallback from "@/components/error-fallback";
-
 import OrderCart from "../components/order-cart";
-import ProductCard from "../components/product-card";
-import CustomItemPopup from "../components/custom-item-popup";
-import useLocalStorage from "@/hooks/use-local-storage";
-import { toast } from "sonner";
+import ProductsCard from "./products-card";
 
 const lineItemSchema = lineItemCreateSchema
   .omit({
@@ -82,17 +74,8 @@ type WatchProps = [string, string, string, string, string, string, string];
 
 const OrderForm = ({ defaultValues }: any) => {
   const pathname = usePathname();
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-
-  const [progress, setProgress] = useState<
-    (EventTarget & HTMLInputElement) | null
-  >(null);
 
   const [cloneData, clearCloneData] = useLocalStorage("clone_data");
-
-  const { data, isLoading, isError } = useGetVariants({ q: search, page });
-
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues
@@ -127,7 +110,7 @@ const OrderForm = ({ defaultValues }: any) => {
   const cartLineItems = watch("lineItems");
 
   const itemsCount = cartLineItems?.reduce(
-    (acc, curr) => (acc += curr.quantity!),
+    (acc, curr) => (acc += curr.currentQuantity!),
     0
   );
 
@@ -177,39 +160,6 @@ const OrderForm = ({ defaultValues }: any) => {
     });
   };
 
-  // check if item is in cart to show active
-  const isItemInCart = (id: number): boolean => {
-    return cartLineItems.findIndex((i) => i.variantId === id) !== -1;
-  };
-
-  /** hanlde product search */
-  const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const { key, currentTarget } = e;
-    const { value } = currentTarget;
-
-    if (key !== "Enter" || !value) return;
-    if (progress) {
-      toast.loading("Please wait...", { id: "toast" });
-      return;
-    }
-    if (isLoading) setProgress(currentTarget);
-  };
-
-  useEffect(() => {
-    if (!isLoading && progress) {
-      const found = data?.data.find((item) => item.barcode === progress.value);
-
-      if (found) {
-        toast.success("Product found", { id: "toast" });
-      } else {
-        toast.error("Product not found", { id: "toast" });
-      }
-      progress.value = "";
-      console.log("progress clered");
-      setProgress(null);
-    }
-  }, [isLoading]);
-
   useEffect(() => {
     calculateCart();
   }, [watchValues]);
@@ -226,45 +176,8 @@ const OrderForm = ({ defaultValues }: any) => {
     <Form {...form}>
       <div className="grid grid-cols-5 gap-6 h-full">
         <div className="col-span-5 lg:col-span-3 space-y-4 flex flex-col">
-          {/* search bar */}
-          <div className="sticky top-[4.5rem] lg:top-6 z-10">
-            <div className="relative">
-              <span className="absolute left-0 inset-y-0 px-3 pointer-events-none inline-flex items-center justify-center">
-                <Search className="w-4 h-4" />
-              </span>
-              <Input
-                placeholder="Search..."
-                className="pl-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleSearch}
-              />
-              {/* custom item popup */}
-              <CustomItemPopup calculateCart={calculateCart} />
-            </div>
-          </div>
-
-          {/* products */}
-          <div className="flex-1 space-y-2">
-            {isLoading ? (
-              <SkeletonLoading />
-            ) : isError ? (
-              <ErrorFallback />
-            ) : (
-              data?.data?.map((variant, i) => (
-                <ProductCard
-                  key={i}
-                  variant={variant}
-                  isActive={isItemInCart(variant.id)}
-                  calculateCart={calculateCart}
-                />
-              ))
-            )}
-          </div>
-          {/* pagination */}
-          {data && <Pagination meta={data.meta} onChange={setPage} />}
+          <ProductsCard calculateCart={calculateCart} />
         </div>
-
         <div className="col-span-2 hidden lg:block">
           <Card className="h-full sticky top-6 max-h-[calc(100vh-3rem)] bg-secondary">
             <OrderCart calculateCart={calculateCart} />

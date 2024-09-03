@@ -110,7 +110,3 @@ textarea {
 .overflow-y-scroll:hover::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
 }
-
-.bn-editor {
-  padding-inline: 24px !important;
-}

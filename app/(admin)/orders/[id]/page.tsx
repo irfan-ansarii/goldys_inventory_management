@@ -198,19 +198,20 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
           <CardHeader>
             <CardTitle className="text-base">Notes</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             {/* empty notes */}
             {!order.notes && (!order.tags || !order.tags.length) && (
               <span className="text-muted-foreground">No notes</span>
             )}
-
-            <div className="whitespace-pre-line">{order.notes}</div>
+            {order.notes && (
+              <div className="whitespace-pre-line">{order.notes}</div>
+            )}
             {order.tags && order.tags.length > 0 && (
-              <div className="space-x-2 mt-4">
+              <div className="space-x-2">
                 {order.tags?.map((tag) => (
                   <Badge
                     variant="outline"
-                    className="py-1 rounded-md"
+                    className="py-1 rounded-md uppercase"
                     key={tag}
                   >
                     {tag}

@@ -50,23 +50,26 @@ const ShipmentCard = ({
               {shipment.status}
             </Badge>
           </CardTitle>
+
           <div className="flex text-sm gap-3">
-            <div>
-              <p className="text-muted-foreground">{shipment.carrier}</p>
-              <Tooltip content="Track order">
-                {shipment.trackingUrl ? (
-                  <a
-                    href={shipment.trackingUrl}
-                    target="_blank"
-                    className="text-indigo-600 hover:underline"
-                  >
-                    {shipment.awb}
-                  </a>
-                ) : (
-                  <p>{shipment.awb}</p>
-                )}
-              </Tooltip>
-            </div>
+            {(shipment.carrier || shipment.trackingUrl) && (
+              <div>
+                <p className="text-muted-foreground">{shipment.carrier}</p>
+                <Tooltip content="Track order">
+                  {shipment.trackingUrl ? (
+                    <a
+                      href={shipment.trackingUrl}
+                      target="_blank"
+                      className="text-indigo-600 hover:underline"
+                    >
+                      {shipment.awb}
+                    </a>
+                  ) : (
+                    <p>{shipment.awb}</p>
+                  )}
+                </Tooltip>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground">
                 {capitalizeText(shipment.status!)} on
@@ -78,7 +81,7 @@ const ShipmentCard = ({
         <ShipmentActions shipment={shipment} />
       </CardHeader>
 
-      <CardContent className="divide-y">
+      <CardContent className="divide-y pt-4 md:pt-6">
         {shipment.lineItems.map((item, i) => (
           <ProductItem
             key={i}

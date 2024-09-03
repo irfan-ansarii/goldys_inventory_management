@@ -1,9 +1,11 @@
 "use client";
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Tooltip from "./custom-ui/tooltip";
+import Link from "next/link";
+import { useRouterStuff } from "@/hooks/use-router-stuff";
 
 export interface Pagination {
   page: number;
@@ -14,12 +16,11 @@ export interface Pagination {
 
 interface PaginationProps {
   meta: Pagination;
-  onChange: (p: number) => void;
 }
 
-const Pagination = ({ meta, onChange }: PaginationProps) => {
+const Pagination = ({ meta }: PaginationProps) => {
   const { page, size, pages, total } = meta;
-
+  const { queryParams } = useRouterStuff();
   const startItem = (page - 1) * size + 1;
   const endItem = Math.min(page * size, total);
 
@@ -31,6 +32,7 @@ const Pagination = ({ meta, onChange }: PaginationProps) => {
         <div className="text-muted-foreground text-sm">
           {`Showing ${startItem} - ${endItem} of ${total}`}
         </div>
+
         <div className="space-x-2">
           {page === 1 ? (
             <Button size="sm" variant="outline" disabled>
@@ -38,13 +40,17 @@ const Pagination = ({ meta, onChange }: PaginationProps) => {
             </Button>
           ) : (
             <Tooltip content="Previous">
-              <Button
-                onClick={() => onChange(Math.max(page - 1, 1))}
-                variant="outline"
-                size="sm"
+              <Link
+                href={
+                  queryParams({
+                    set: { page: `${Math.max(page - 1, 1)}` },
+                    getNewPath: true,
+                  }) as string
+                }
+                className={buttonVariants({ variant: "outline", size: "sm" })}
               >
                 <ChevronLeft className="w-4 h-4" />
-              </Button>
+              </Link>
             </Tooltip>
           )}
 
@@ -56,13 +62,21 @@ const Pagination = ({ meta, onChange }: PaginationProps) => {
             </Button>
           ) : (
             <Tooltip content="Next">
-              <Button
-                onClick={() => onChange(Math.min(page + 1, pages))}
-                variant="outline"
-                size="sm"
+              <Link
+                href={
+                  queryParams({
+                    set: { page: `${Math.min(page + 1, pages)}` },
+                    getNewPath: true,
+                  }) as string
+                }
+                className={buttonVariants({
+                  variant: "outline",
+                  size: "sm",
+                  className: "px-",
+                })}
               >
                 <ChevronRight className="w-4 h-4" />
-              </Button>
+              </Link>
             </Tooltip>
           )}
         </div>

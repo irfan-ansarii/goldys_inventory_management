@@ -21,10 +21,10 @@ interface ShippingLine {
 }
 interface Props {
   data: Record<string, any>;
-  topic: "create" | "update";
+
   store: Record<string, any>;
 }
-export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
+export const handleWebhhokOrder = async ({ data, store }: Props) => {
   const order = await getOrder(undefined, {
     name: data.name,
     storId: store.id,
@@ -36,9 +36,11 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
     accessToken: store.token!,
   });
 
-  let action = topic;
-  if (topic === "create" && order) action = "update";
-  if (topic === "update" && !order) action = "create";
+  let action = "";
+
+  // update only if processing
+  if (order && order.shipmentStatus === "processing") action = "update";
+  if (!order) action = "create";
 
   /**************
    * Hanlde Order
@@ -148,7 +150,6 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
   /*********************
    * Handle Transactions
    ********************/
-
   const [txns, appTxns] = await Promise.all([
     getChannelTransactions(client, data.id),
     getTransactions(orderEntity?.id),
@@ -157,23 +158,23 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
   if (txns && appTxns) {
     const paymentIds = new Set(appTxns.map((txn) => txn.paymentId));
 
-    const createTransactionsData = txns
-      .filter(
-        (txn) =>
-          (txn.kind === "sale" || txn.kind === "refund") &&
-          txn.status === "success" &&
-          !paymentIds.has(txn.id)
-      )
-      .map((txn) => ({
-        storeId: store.id,
-        orderId: orderEntity?.id,
-        name: txn.gateway
-          .replace("gift_card", "Gift Card")
-          .replace(/Razorpay.*/i, "Razorpay"),
-        kind: txn.kind,
-        amount: txn.amount,
-        paymentId: txn.id,
-      }));
+    const filtered = txns.filter(
+      (txn) =>
+        (txn.kind === "sale" || txn.kind === "refund") &&
+        txn.status === "success" &&
+        !paymentIds.has(`${txn.id}`)
+    );
+
+    const createTransactionsData = filtered.map((txn) => ({
+      storeId: store.id,
+      orderId: orderEntity?.id,
+      name: txn.gateway
+        .replace("gift_card", "Gift Card")
+        .replace(/Razorpay.*/i, "Razorpay"),
+      kind: txn.kind,
+      amount: txn.amount,
+      paymentId: txn.id,
+    }));
 
     if (createTransactionsData.length > 0) {
       await createTransactions(createTransactionsData);
@@ -191,7 +192,7 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
     due,
   });
 
-  // return ealy if topic is update do not create line items
+  // return early if topic is update do not create line items
   if (action === "update") {
     return new Promise((res) => res(true));
   }
@@ -352,6 +353,7 @@ const getChannelTransactions = async (
   return transactions;
 };
 
+// get image from shopify
 const getChannelProductImages = async (
   client: AdminRestApiClient,
   productId: string | number
