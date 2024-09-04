@@ -172,6 +172,9 @@ const StoresPopup = ({ children, defaultValues }: Props) => {
                       src={logo}
                     />
                   )}
+                  {!logo && (
+                    <p className="text-sm text-destructive">Required</p>
+                  )}
                 </div>
                 <FormMessage />
               </div>
@@ -302,7 +305,9 @@ const StoresPopup = ({ children, defaultValues }: Props) => {
             <Button
               type="submit"
               className="w-full"
-              // disabled={createUser.isPending || updateUser.isPending}
+              disabled={
+                create.isPending || update.isPending || upload.isPending
+              }
             >
               {create.isPending || update.isPending ? (
                 <Loader className="w-4 h-4 animate-spin" />

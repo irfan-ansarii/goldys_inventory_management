@@ -1,8 +1,11 @@
+import { Metadata } from "next";
 import { getProduct } from "@/query/products";
+import ProductForm from "../components/product-form";
 
-import EditForm from "../components/edit-form";
-
-const NewProductPage = async ({ params }: { params: Record<string, any> }) => {
+export const metadata: Metadata = {
+  title: "Edit Product",
+};
+const EditProductPage = async ({ params }: { params: Record<string, any> }) => {
   const { id } = params;
 
   const { data: product } = await getProduct(id);
@@ -13,11 +16,11 @@ const NewProductPage = async ({ params }: { params: Record<string, any> }) => {
   }));
 
   return (
-    <EditForm
+    <ProductForm
       defaultValues={{ ...product, variants: defaultVariants }}
       id={product.id}
     />
   );
 };
 
-export default NewProductPage;
+export default EditProductPage;

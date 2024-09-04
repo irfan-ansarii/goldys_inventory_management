@@ -9,13 +9,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import Tooltip from "@/components/custom-ui/tooltip";
 import Avatar from "@/components/custom-ui/avatar";
 import Actions from "./actions";
+import Inventories from "./inventories";
 
 const ProductCard = ({ product }: { product: ProductType }) => {
   const isArchived = product.status === "archived";
 
   return (
     <Card className="hover:border-foreground transition duration-500 overflow-hidden">
-      <CardContent className="flex gap-4 p-4">
+      <CardContent className="flex gap-4">
         <span className="shrink-0">
           <Avatar src={product.image || product.title!} />
         </span>
@@ -37,29 +38,7 @@ const ProductCard = ({ product }: { product: ProductType }) => {
             <Tooltip
               content={
                 <div className="divide-y p-2 w-52">
-                  {product.inventories?.map((inv) => (
-                    <div
-                      className="flex items-center py-2 first:pt-0 last:pb-0"
-                      key={inv.id}
-                    >
-                      <div className="flex-1">
-                        <h2 className="text-sm leading-none">
-                          {inv.store?.name}
-                        </h2>
-                        <Badge variant="secondary" className="py-0">
-                          {inv.variantTitle}
-                        </Badge>
-                      </div>
-                      <Badge
-                        variant={
-                          (inv.stock || 0) >= 5 ? "success" : "destructive"
-                        }
-                        className="py-0 ml-auto"
-                      >
-                        {inv.stock}
-                      </Badge>
-                    </div>
-                  ))}
+                  <Inventories data={product.inventories} />
                 </div>
               }
               variant="card"

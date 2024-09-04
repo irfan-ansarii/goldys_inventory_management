@@ -44,7 +44,8 @@ const app = new Hono()
   })
 
   .get("/tracking", async (c) => {
-    limiter.schedule(() => new Promise((res, rej) => res(true)));
+    // handle shiprocket updates
+    limiter.schedule(() => new Promise((res) => res(true)));
 
     const counts = limiter.counts();
 

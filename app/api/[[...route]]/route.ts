@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { handle } from "hono/vercel";
 import { jwt } from "hono/jwt";
+import { JwtVariables } from "hono/jwt";
 import { HTTPException } from "hono/http-exception";
 
 import authHandler from "@/app/api/routes/auth";
@@ -22,7 +23,9 @@ import tasksHandler from "@/app/api/routes/tasks";
 
 export const runtime = "edge";
 
-const app = new Hono().basePath("/api");
+type Variables = JwtVariables;
+
+const app = new Hono<{ Variables: Variables }>().basePath("/api");
 
 app.use("*", cors());
 

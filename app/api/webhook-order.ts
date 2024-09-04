@@ -147,6 +147,7 @@ export const handleWebhhokOrder = async ({ data, store }: Props) => {
   if (action === "update")
     orderEntity = await updateOrder(order.id, createOrderData);
 
+  console.log("created order::", orderEntity);
   /*********************
    * Handle Transactions
    ********************/

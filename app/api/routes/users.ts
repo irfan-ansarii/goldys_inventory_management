@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { stream, streamText, streamSSE } from "hono/streaming";
 
 import z from "zod";
 import { zValidator } from "@hono/zod-validator";
@@ -13,7 +12,6 @@ import {
   updateUser,
 } from "@/drizzle/services/users";
 import { HTTPException } from "hono/http-exception";
-import { DELETE_ROLES } from "../utils";
 
 const userSchema = userCreateSchema
   .pick({

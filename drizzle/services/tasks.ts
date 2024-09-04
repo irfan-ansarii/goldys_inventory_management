@@ -9,6 +9,7 @@ import {
   eq,
   getTableColumns,
   ilike,
+  inArray,
   or,
 } from "drizzle-orm";
 import { PAGE_LIMIT } from "@/app/api/utils";
@@ -36,11 +37,20 @@ export const createTask = async (values: z.infer<typeof schema>) => {
 export const getTask = async (id: any) => {
   return await db.select().from(tasks).where(eq(tasks.id, id)).then(findFirst);
 };
+
 export const getTasks = async (params?: Record<string, any>) => {
-  const { q, status, userId, limit = PAGE_LIMIT, page = 1 } = params || {};
+  const {
+    q,
+    status,
+    statuses,
+    userId,
+    limit = PAGE_LIMIT,
+    page = 1,
+  } = params || {};
 
   const filters = and(
     status ? eq(tasks.status, status) : undefined,
+    statuses ? inArray(tasks.status, statuses) : undefined,
     userId
       ? or(eq(tasks.createdBy, userId), arrayContains(tasks.users, [userId]))
       : undefined,

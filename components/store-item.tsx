@@ -21,7 +21,7 @@ const StoreItem = ({ store }: { store: StoreType }) => {
     switchStore.mutate(undefined, {
       onSuccess: ({ data }) => {
         login(data.token);
-        window.location.reload();
+        window.location.href = "/dashboard";
       },
     });
   };

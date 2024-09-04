@@ -1,9 +1,13 @@
 import React from "react";
+import { Metadata } from "next";
 import { getOrders } from "@/query/orders";
 import OrderCard from "../components/order-card";
 import Pagination from "@/components/pagination";
 import NoDataFallback from "@/components/nodata-fallback";
 
+export const metadata: Metadata = {
+  title: "Orders",
+};
 const OrdersPage = async ({
   searchParams,
 }: {

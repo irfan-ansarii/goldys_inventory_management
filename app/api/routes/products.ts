@@ -139,11 +139,37 @@ const app = new Hono()
 
     const results = await Promise.all(
       data.map(async (item) => {
-        const { data } = await getInventories({ productId: item.id });
+        const { data } = await getInventories({
+          productId: item.id,
+          limit: 100,
+        });
+
+        const reversed = data.reverse().reduce((acc, item) => {
+          const { storeId, store, stock } = item;
+
+          if (!acc[storeId]) {
+            acc[storeId] = {
+              storeId: storeId,
+              storeName: store?.name!,
+              products: [],
+              stock: 0,
+            };
+          }
+          acc[storeId].stock += stock;
+
+          acc[storeId].products.push({
+            id: item.id,
+            title: item.variantTitle,
+            stock,
+          });
+
+          return acc;
+        }, {} as Record<any, any>);
+
         return {
           ...item,
           variants: await getVariants({ productId: item.id }),
-          inventories: data,
+          inventories: Object.values(reversed),
         };
       })
     );

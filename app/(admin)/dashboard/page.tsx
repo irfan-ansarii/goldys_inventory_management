@@ -30,7 +30,7 @@ const DashboardPage = async ({
 }) => {
   return (
     <div className="grid grid-cols-6 gap-4 md:gap-6 [&>div]:relative">
-      {/* incode card */}
+      {/* income card */}
       <Card className="col-span-6 md:col-span-2 p-6 relative space-y-3">
         <IconCard
           iconColor="bg-green-600 text-white"

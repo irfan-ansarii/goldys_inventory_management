@@ -1,5 +1,14 @@
 import { alias } from "drizzle-orm/pg-core";
-import { count, desc, eq, getTableColumns } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  or,
+  sql,
+} from "drizzle-orm";
 import { users } from "../schemas/users";
 import { db, findFirst } from "../db";
 
@@ -62,6 +71,19 @@ export const deletePurchase = async (id: any) => {
 export const getPurchases = async (params: Record<string, any>) => {
   const { q, status, limit = PAGE_LIMIT, page = 1, storeId } = params || {};
 
+  const filters = and(
+    eq(purchase.storeId, storeId),
+    status ? eq(purchase.paymentStatus, sql`LOWER(${status})`) : undefined,
+    q
+      ? or(
+          ilike(purchase.name, `%${q}%`),
+          ilike(supplier.name, `%${q}%`),
+          ilike(supplier.phone, `%${q}%`),
+          ilike(supplier.phone, `%${q}%`)
+        )
+      : undefined
+  );
+
   const results = await db
     .select({
       ...getTableColumns(purchase),
@@ -82,7 +104,7 @@ export const getPurchases = async (params: Record<string, any>) => {
     .leftJoin(createdBy, eq(createdBy.id, purchase.createdBy))
     .leftJoin(updatedBy, eq(updatedBy.id, purchase.updatedBy))
     .leftJoin(supplier, eq(supplier.id, purchase.supplierId))
-    .where(eq(purchase.storeId, storeId))
+    .where(filters)
     .groupBy(purchase.id, supplier.id, createdBy.id, updatedBy.id)
     .orderBy(desc(purchase.id))
     .limit(limit)
@@ -91,7 +113,7 @@ export const getPurchases = async (params: Record<string, any>) => {
   const records = await db
     .select({ total: count(purchase) })
     .from(purchase)
-    .where(eq(purchase.storeId, storeId))
+    .where(filters)
     .then(findFirst);
 
   return {

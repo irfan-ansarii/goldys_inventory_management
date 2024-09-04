@@ -12,6 +12,13 @@ import {
 } from "@/drizzle/services/stores";
 import { sign } from "hono/jwt";
 import { updateUser } from "@/drizzle/services/users";
+import { STORE_DATA } from "@/lib/STORE_DATA";
+import { upsertOption } from "@/drizzle/services/options";
+import {
+  createInventories,
+  getVariantsProduct,
+} from "@/drizzle/services/products";
+import { limiter } from "@/lib/utils";
 
 const storeCreateSchema = storeSchema.omit({
   id: true,
@@ -26,14 +33,43 @@ const app = new Hono()
   /********************************************************************* */
   .post("/", zValidator("json", storeCreateSchema), async (c) => {
     const data = c.req.valid("json");
-    const { role } = c.get("jwtPayload");
+    const { role, id } = c.get("jwtPayload");
 
     if (role !== "admin")
       throw new HTTPException(403, { message: "Permisson denied" });
 
     const store = await createStore(data);
 
-    // TODO create options and inventories
+    await Promise.all(
+      STORE_DATA.map((s) =>
+        upsertOption({
+          key: s.key,
+          value: JSON.stringify(s.values),
+          storeId: store.id,
+          createdBy: id,
+          updatedBy: id,
+        })
+      )
+    );
+
+    let page: number | null = 1;
+
+    do {
+      const { data, meta } = await getVariantsProduct({ page, limit: 100 });
+
+      const inventoriesToCreate = data.map((variant) => ({
+        storeId: store.id,
+        productId: variant.productId!,
+        variantId: variant.id,
+        stock: 0,
+        updatedBy: id,
+      }));
+
+      limiter.schedule(() => createInventories(inventoriesToCreate));
+
+      page = meta.page < meta.pages ? page + 1 : null;
+    } while (page !== null);
+
     return c.json({ success: true, data: store }, 201);
   })
 
@@ -64,7 +100,7 @@ const app = new Hono()
 
     const payload = {
       id: userId,
-      storeId: id,
+      storeId: Number(id),
       role: role,
       exp: Math.floor(Date.now() / 1000) + 86400 * 7 /** 7 days */,
     };

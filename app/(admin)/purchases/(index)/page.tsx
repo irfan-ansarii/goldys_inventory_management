@@ -7,7 +7,7 @@ import { getpurchases } from "@/query/purchase";
 import NoDataFallback from "@/components/nodata-fallback";
 
 export const metadata: Metadata = {
-  title: "Purchases",
+  title: "Purchase",
 };
 const PurchasePage = async ({
   searchParams,

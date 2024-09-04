@@ -5,15 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProductType, useDeleteProduct } from "@/query/products";
 
-import { Box, EllipsisVertical, Home, Pencil, Printer } from "lucide-react";
+import { Box, EllipsisVertical, Pencil, Printer } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 
 import Popup from "@/components/custom-ui/popup";
 import DeletePopup from "@/components/delete-popup";
-import { Badge } from "@/components/ui/badge";
-import { DialogTitle } from "@/components/ui/dialog";
 import BarcodePopup from "./barcode-popup";
+import Inventories from "./inventories";
 
 const Actions = ({ product }: { product: ProductType }) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -52,39 +51,7 @@ const Actions = ({ product }: { product: ProductType }) => {
                 content={
                   <div className="p-2 md:w-52">
                     <div className="divide-y overflow-y-scroll max-h-[30rem]">
-                      {product?.inventories?.map((inv) => (
-                        <div
-                          className="grid grid-cols-3 gap-3 py-2 first:pt-0 last:pb-0"
-                          key={inv.id}
-                        >
-                          <div className="col-span-2 space-y-1">
-                            <h2 className="text-sm font-medium">
-                              {inv.store?.name}
-                            </h2>
-                            <div className="flex gap-2">
-                              <Badge variant="secondary" className="py-0">
-                                {inv.variantTitle}
-                              </Badge>
-                              <Badge variant="secondary" className="py-0">
-                                {inv.barcode}
-                              </Badge>
-                            </div>
-                          </div>
-
-                          <div className="text-right">
-                            <Badge
-                              variant={
-                                (inv.stock || 0) >= 5
-                                  ? "success"
-                                  : "destructive"
-                              }
-                              className="py-0"
-                            >
-                              {inv.stock}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
+                      <Inventories data={product.inventories} />
                     </div>
                   </div>
                 }

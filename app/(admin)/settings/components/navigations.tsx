@@ -27,6 +27,10 @@ const settingRoutes = [
     slug: "/users",
   },
   {
+    label: "Import/Export",
+    slug: "/import-export",
+  },
+  {
     label: "Incentives",
     slug: "/incentives",
   },

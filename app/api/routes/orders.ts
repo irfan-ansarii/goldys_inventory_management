@@ -185,7 +185,7 @@ const app = new Hono()
         reason: "Sale",
       }));
 
-    updateStock(storeId, itemsToAdjust);
+    await updateStock(storeId, itemsToAdjust);
 
     return c.json({ data: createdOrder, success: true }, 200);
   })
@@ -220,19 +220,11 @@ const app = new Hono()
 
     const res = await getOrder(id);
 
-    if (!res || res.storeId !== storeId) {
-      throw new HTTPException(404, { message: "Not found" });
+    if (res?.storeId !== storeId) {
+      throw new HTTPException(404, { message: "Order not found" });
     }
 
     const lineItems = await getLineItems(res.id);
-
-    const products = lineItems.map((line) => {
-      const minQty = line.currentQuantity! - line.shippingQuantity!;
-      return {
-        ...line,
-        ...(minQty ? { minQty } : undefined),
-      };
-    });
 
     const processing = lineItems.filter(
       (item) => item.requiresShipping && item.shippingQuantity! > 0
@@ -273,10 +265,10 @@ const app = new Hono()
     const order = await getOrder(orderId);
 
     if (!order || order.storeId !== storeId) {
-      throw new HTTPException(404, {
-        message: "Not found",
-      });
+      throw new HTTPException(404, { message: "Order not found" });
     }
+    if (order.cancelledAt || order.shipmentStatus !== "processing")
+      throw new HTTPException(400, { message: "Order could not be edited" });
 
     const { lineItems, ...rest } = c.req.valid("json");
 
@@ -368,7 +360,7 @@ const app = new Hono()
         };
       });
 
-    updateStock(storeId, itemsToAdjust);
+    await updateStock(storeId, itemsToAdjust);
 
     return c.json(
       {
@@ -409,11 +401,11 @@ const app = new Hono()
   /********************************************************************* */
   .delete("/:id", async (c) => {
     const { id: orderId } = c.req.param();
-    const { id: userId, storeId, role } = c.get("jwtPayload");
+    const { storeId, role } = c.get("jwtPayload");
 
     const order = await getOrder(orderId);
 
-    if (!order || order.storeId !== storeId) {
+    if (order?.storeId !== storeId) {
       throw new HTTPException(404, { message: "Order not found" });
     }
     if (!DELETE_ROLES.includes(role))
@@ -446,8 +438,10 @@ const app = new Hono()
     if (order.invoice) await del(order.invoice);
     await updateOrder(order.id, { invoice: blobResponse.url });
 
+    // TODO implement the ability to send invoice throught email and whatsapp
     if (action === "send") {
       // send invoice to customer via email and whatsapp
+      // use limiter to queue the messae
     }
 
     return c.json({ data: { url: blobResponse.url }, success: true }, 200);
@@ -467,8 +461,8 @@ const app = new Hono()
 
       const order = await getOrder(orderId);
 
-      if (order.storeId !== storeId)
-        throw new HTTPException(404, { message: "Not found" });
+      if (order?.storeId !== storeId)
+        throw new HTTPException(404, { message: "Order not found" });
 
       if (data.length === 0)
         throw new HTTPException(400, {
@@ -528,9 +522,10 @@ const app = new Hono()
 
       const order = await getOrder(orderId);
 
-      if (!order || order.storeId !== storeId) {
+      if (order?.storeId !== storeId) {
         throw new HTTPException(404, { message: "Order Not found" });
       }
+
       const orderLineItems = await getLineItems(orderId);
 
       const orderLineItemsMap = new Map(
@@ -544,7 +539,9 @@ const app = new Hono()
 
       /** check if all line items are in the order processing */
       if (lineItems.length === 0 || !allItemsExist)
-        throw new HTTPException(400, { message: "Items cannot be processed" });
+        throw new HTTPException(400, {
+          message: "Items cannnot be processed",
+        });
 
       // create shipment
       const shipment = await createShipment({
@@ -558,32 +555,8 @@ const app = new Hono()
         updatedBy: userId,
       });
 
-      // create shipment line items
-      const createdLineItems = await createShipmentLineItems(
-        lineItems.map((item) => ({
-          ...item,
-          shipmentId: shipment.id,
-          quantity: Number(item.quantity),
-        }))
-      );
-
-      // adjust order line items shipping quantity
-      await updateOrder(orderId, {
-        shipmentStatus: "shipped",
-        tags: [...order.tags!, "shipped"],
-      });
-
-      await Promise.all(
-        createdLineItems.map((line) => {
-          const item = orderLineItems.find((ol) => ol.id === line.lineItemId);
-          return updateLineItem(item?.id, {
-            shippingQuantity: item?.shippingQuantity! - line.quantity!,
-          });
-        })
-      );
-
       // update stock
-      const itemsToAdjust = createdLineItems.map((item) => ({
+      const itemsToAdjust = lineItems.map((item) => ({
         storeId,
         createdBy: userId,
         updatedBy: userId,
@@ -594,13 +567,34 @@ const app = new Hono()
         reason: "sale",
       }));
 
-      await updateStock(storeId, itemsToAdjust);
+      await Promise.all([
+        // create shipment line items
+        createShipmentLineItems(
+          lineItems.map((item) => ({
+            ...item,
+            shipmentId: shipment.id,
+            quantity: Number(item.quantity),
+          }))
+        ),
+        // update order
+        updateOrder(orderId, {
+          shipmentStatus: "shipped",
+          tags: [...order.tags!, "shipped"],
+        }),
+        // update order line items
+        ...lineItems.map((line) => {
+          const item = orderLineItems.find((ol) => ol.id === line.lineItemId);
+          return updateLineItem(item?.id, {
+            shippingQuantity: item?.shippingQuantity! - line.quantity!,
+          });
+        }),
+        // update stocks
+        updateStock(storeId, itemsToAdjust),
+      ]);
 
-      /** Schedule message shipped message*/
-      return c.json(
-        { data: { ...shipment, lineItems: createdLineItems }, success: true },
-        200
-      );
+      // TODO schedule order shipped message
+
+      return c.json({ data: { ...shipment }, success: true }, 200);
     }
   )
   /********************************************************************* */
@@ -621,13 +615,13 @@ const app = new Hono()
         throw new HTTPException(404, { message: "Order not found" });
       }
 
-      /** check if all line items were in the original shipment */
       const shipmentLineItems = await getShipmentLineItems(shipmentId);
 
       const shipmentLineItemsMap = new Map(
         shipmentLineItems.map((item) => [item.lineItemId, item.quantity])
       );
 
+      /** check if all line items were in the original shipment */
       const allItemsExist = lineItems.every((line) => {
         const quantity = shipmentLineItemsMap.get(line.lineItemId!) as number;
         return line.quantity > 0 && line.quantity <= quantity;
@@ -649,28 +643,28 @@ const app = new Hono()
         updatedBy: userId,
       });
 
-      // create shipment line items
-      await createShipmentLineItems(
-        lineItems.map((item) => ({
-          ...item,
-          shipmentId: shipment.id,
-          quantity: Number(item.quantity),
-        }))
-      );
+      await Promise.all([
+        // create shipment line items
+        createShipmentLineItems(
+          lineItems.map((item) => ({
+            ...item,
+            shipmentId: shipment.id,
+            quantity: Number(item.quantity),
+          }))
+        ),
+        // update current shipment
+        updateShipment(shipmentId, {
+          actions: [],
+          updatedBy: userId,
+        }),
+        // update order status
+        updateOrder(orderId, {
+          shipmentStatus: "return initiated",
+          tags: [...order.tags!, "return initiated"],
+        }),
+      ]);
 
-      // update current shipment
-      await updateShipment(shipmentId, {
-        actions: [],
-        updatedBy: userId,
-      });
-
-      // update order status
-      await updateOrder(orderId, {
-        shipmentStatus: "return initiated",
-        tags: [...order.tags!, "return initiated"],
-      });
-
-      /** Schedule return message*/
+      // TODO scheduel return initiated message
       return c.json({ data: shipment, success: true }, 200);
     }
   )
@@ -724,68 +718,51 @@ const app = new Hono()
         return c.json({ data: shipment, success: true }, 200);
       }
 
-      // handle rto action
+      // handle initiate rto action
       if (action === "rto" && shipment.kind === "forward") {
-        const shipment = await updateShipment(shipmentId, {
-          kind: "rto",
-          status: "rto initiated",
-          actions: ["edit", "complete"],
-          updatedBy: userId,
-        });
+        const [updatedShipment] = await Promise.all([
+          // update shipment
+          updateShipment(shipmentId, {
+            kind: "rto",
+            status: "rto initiated",
+            actions: ["edit", "complete"],
+            updatedBy: userId,
+          }),
+          // update order
+          updateOrder(orderId, {
+            shipmentStatus: "rto initiated",
+            tags: [...order.tags!, "rto initiated"],
+          }),
+        ]);
 
-        await updateOrder(orderId, {
-          shipmentStatus: "rto initiated",
-          tags: [...order.tags!, "rto initiated"],
-        });
-        return c.json({ data: shipment, success: true }, 200);
+        return c.json({ data: updatedShipment, success: true }, 200);
       }
 
-      // handle complete action
+      // handle delivered/complete action
       if (shipment.kind === "forward") {
-        const shipmentRes = await updateShipment(shipmentId, {
-          status: "delivered",
-          actions: ["return"],
-          updatedBy: userId,
-        });
-
-        await updateOrder(orderId, {
-          shipmentStatus: "delivered",
-          tags: [...order.tags!, "delivered"],
-        });
-        /** Schedule delivered message*/
-        return c.json({ data: shipmentRes, success: true }, 200);
+        const [updatedShipment] = await Promise.all([
+          // update shipment
+          updateShipment(shipmentId, {
+            status: "delivered",
+            actions: ["return"],
+            updatedBy: userId,
+          }),
+          // update order
+          updateOrder(orderId, {
+            shipmentStatus: "delivered",
+            tags: [...order.tags!, "delivered"],
+          }),
+        ]);
+        // TODO schedule message/email
+        return c.json({ data: updatedShipment, success: true }, 200);
       }
 
       // handle rto and return completation
-      const orderLineItems = await getLineItems(orderId);
-      const shipmentLineItems = await getShipmentLineItems(shipmentId);
+      const [orderLineItems, shipmentLineItems] = await Promise.all([
+        getLineItems(orderId),
+        getShipmentLineItems(shipmentId),
+      ]);
 
-      // update shipment
-      const shipmentRes = await updateShipment(shipmentId, {
-        status: shipment.kind === "rto" ? "rto delivered" : "returned",
-        actions: [],
-        updatedBy: userId,
-      });
-
-      // update order and line items
-      await updateOrder(orderId, {
-        shipmentStatus: shipment.kind === "rto" ? "rto delivered" : "returned",
-        tags: [
-          ...order.tags!,
-          shipment.kind === "rto" ? "rto delivered" : "returned",
-        ],
-      });
-
-      await Promise.all(
-        shipmentLineItems.map((line) => {
-          const item = orderLineItems.find((ol) => ol.id === line.lineItemId);
-          return updateLineItem(item?.id, {
-            shippingQuantity: item?.shippingQuantity! + line.quantity!,
-          });
-        })
-      );
-
-      // update stock
       const itemsToAdjust = shipmentLineItems.map((item) => ({
         storeId,
         updatedBy: userId,
@@ -796,9 +773,36 @@ const app = new Hono()
         reason: "shipment returned",
       }));
 
-      await updateStock(storeId, itemsToAdjust);
+      const [updatedShipment] = await Promise.all([
+        // update shipment
+        updateShipment(shipmentId, {
+          status: shipment.kind === "rto" ? "rto delivered" : "returned",
+          actions: [],
+          updatedBy: userId,
+        }),
+        // update order
+        updateOrder(orderId, {
+          shipmentStatus:
+            shipment.kind === "rto" ? "rto delivered" : "returned",
+          tags: [
+            ...order.tags!,
+            shipment.kind === "rto" ? "rto delivered" : "returned",
+          ],
+        }),
+        // update order line items
+        ...shipmentLineItems.map((line) => {
+          const item = orderLineItems.find((ol) => ol.id === line.lineItemId);
+          return updateLineItem(item?.id, {
+            shippingQuantity: item?.shippingQuantity! + line.quantity!,
+          });
+        }),
+        // update stocks
+        updateStock(storeId, itemsToAdjust),
+      ]);
 
-      return c.json({ data: shipmentRes, success: true }, 200);
+      // TODO if returned create task to issue store credit
+
+      return c.json({ data: updatedShipment, success: true }, 200);
     }
   )
   /********************************************************************* */
@@ -822,37 +826,25 @@ const app = new Hono()
 
     // handle return shipment
     if (shipment.kind === "return") {
-      await updateOrder(orderId, {
-        shipmentStatus: "delivered",
-        tags: [...order.tags!, "return cancelled"],
-      });
-      await updateShipment(shipmentId, { status: "cancelled" });
-      await updateShipment(shipment.parentId, { actions: ["return"] });
-      return c.json({ data: shipment, success: true }, 200);
+      const [updatedShipment] = await Promise.all([
+        // update shipment
+        updateShipment(shipmentId, { status: "cancelled" }),
+        // update parenr shipment
+        updateShipment(shipment.parentId, { actions: ["return"] }),
+        // update order
+        updateOrder(orderId, {
+          shipmentStatus: "delivered",
+          tags: [...order.tags!, "return cancelled"],
+        }),
+      ]);
+      return c.json({ data: updatedShipment, success: true }, 200);
     }
 
-    const orderLineItems = await getLineItems(orderId);
-    const shipmentLineItems = await getShipmentLineItems(shipmentId);
+    const [orderLineItems, shipmentLineItems] = await Promise.all([
+      getLineItems(orderId),
+      getShipmentLineItems(shipmentId),
+    ]);
 
-    // update order and line items
-    await updateOrder(orderId, {
-      shipmentStatus: "processing",
-      tags: [...order.tags!, "shipment cancelled"],
-    });
-
-    await Promise.all(
-      shipmentLineItems.map((line) => {
-        const item = orderLineItems.find((ol) => ol.id === line.lineItemId);
-        return updateLineItem(item?.id, {
-          shippingQuantity: item?.shippingQuantity! + line.quantity!,
-        });
-      })
-    );
-
-    // update shipment
-    await updateShipment(shipmentId, { status: "cancelled" });
-
-    // update stock
     const itemsToAdjust = shipmentLineItems.map((item) => ({
       storeId,
       createdBy: userId,
@@ -864,7 +856,24 @@ const app = new Hono()
       reason: "shipment cancelled",
     }));
 
-    await updateStock(storeId, itemsToAdjust);
+    await Promise.all([
+      // update shipemnt
+      updateShipment(shipmentId, { status: "cancelled" }),
+      // update order
+      updateOrder(orderId, {
+        shipmentStatus: "processing",
+        tags: [...order.tags!, "shipment cancelled"],
+      }),
+      // update line items
+      ...shipmentLineItems.map((line) => {
+        const item = orderLineItems.find((ol) => ol.id === line.lineItemId);
+        return updateLineItem(item?.id, {
+          shippingQuantity: item?.shippingQuantity! + line.quantity!,
+        });
+      }),
+      // update stocks
+      updateStock(storeId, itemsToAdjust),
+    ]);
 
     return c.json({ data: "res", success: true }, 200);
   });
