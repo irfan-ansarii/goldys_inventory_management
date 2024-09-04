@@ -31,16 +31,12 @@ const app = new Hono()
       return;
     }
 
-    limiter.schedule(() => handleWebhhokOrder({ data: webhookOrder, store }));
+    await limiter.schedule(() =>
+      handleWebhhokOrder({ data: webhookOrder, store })
+    );
 
     console.log(`Scheduled ${topic} event for order ${webhookOrder.name}...`);
 
-    const counts = limiter.counts();
-
-    console.log("scheduler task::", counts);
-
-    const a = limiter.jobs();
-    console.log("jobs:", a);
     return c.json({ success: true }, 200);
   })
 
