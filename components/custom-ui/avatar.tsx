@@ -1,11 +1,12 @@
 import React, { Children } from "react";
+import Image from "next/image";
 import {
   Avatar as AvatarRoot,
   AvatarImage,
   AvatarFallback,
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Image } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import Tooltip from "./tooltip";
 
 interface Props {
@@ -32,11 +33,13 @@ const Avatar = ({ className, fallbackClassName, src, title }: Props) => {
   const component = (
     <AvatarRoot className={cn("border-2", className)}>
       {isSourceString && source && (
-        <AvatarImage src={source as string} className="object-cover" />
+        <AvatarImage src={source as string} className="object-cover" asChild>
+          <Image src={source as string} alt="logo" width={40} height={40} />
+        </AvatarImage>
       )}
 
       <AvatarFallback className={`rounded-none bg-accent ${fallbackClassName}`}>
-        <Image className="w-4 h-4" />
+        <ImageIcon className="w-4 h-4" />
       </AvatarFallback>
     </AvatarRoot>
   );

@@ -33,7 +33,7 @@ export default async function Home() {
       <div className="relative z-10 py-28">
         <div className="mx-auto max-w-lg text-center">
           <h1 className="mt-5 font-display font-extrabold text-6xl leading-tight">
-            Welcome to Goldy's Nestt
+            Welcome to Goldys Nestt
             <br />
             <span className="bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-500 bg-clip-text text-transparent">
               Superpowers
@@ -79,16 +79,16 @@ export default async function Home() {
               />
             </div>
             <div className="text-gray-200">
-              "Dub's link infrastructure &amp; analytics has helped us gain
+              Dubs link infrastructure &amp; analytics has helped us gain
               valuable insights into the link-sharing use case of Ray.so. And
-              all of it with just a few lines of code."
+              all of it with just a few lines of code.
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex flex-col space-y-0.5 invert">
                 <div className="font-semibold text-gray-800">
                   Thomas Paul Mann
                 </div>
-                <div className="text-sm text-gray-500">CEO, Raycast</div>
+                <div className="text-sm text-gray-500">CEO Raycast</div>
               </div>
               <img
                 alt="Thomas Paul Mann"
