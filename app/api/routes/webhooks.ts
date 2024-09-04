@@ -14,6 +14,7 @@ const app = new Hono()
     const topic = c.req.header("x-shopify-topic");
     const domain = c.req.header("X-Shopify-Shop-Domain");
 
+    console.log("domain:::", domain);
     const { data } = await getStores();
     const store = data.find((s) => s.domain === domain);
 

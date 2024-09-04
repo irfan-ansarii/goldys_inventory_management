@@ -25,6 +25,8 @@ interface Props {
   store: Record<string, any>;
 }
 export const handleWebhhokOrder = async ({ data, store }: Props) => {
+  console.log("received event::");
+
   const order = await getOrder(undefined, {
     name: data.name,
     storId: store.id,
