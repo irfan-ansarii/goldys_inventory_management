@@ -25,8 +25,6 @@ interface Props {
   store: Record<string, any>;
 }
 export const handleWebhhokOrder = async ({ data, store }: Props) => {
-  console.log("received event::");
-
   const order = await getOrder(undefined, {
     name: data.name,
     storId: store.id,
@@ -149,7 +147,6 @@ export const handleWebhhokOrder = async ({ data, store }: Props) => {
   if (action === "update")
     orderEntity = await updateOrder(order.id, createOrderData);
 
-  console.log("created order::", orderEntity);
   /*********************
    * Handle Transactions
    ********************/

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-
+import { waitUntil } from "@vercel/functions";
 import { getStores } from "@/drizzle/services/stores";
 import { HTTPException } from "hono/http-exception";
 
@@ -14,7 +14,6 @@ const app = new Hono()
     const topic = c.req.header("x-shopify-topic");
     const domain = c.req.header("X-Shopify-Shop-Domain");
 
-    console.log("domain:::", domain);
     const { data } = await getStores();
     const store = data.find((s) => s.domain === domain);
 
@@ -27,13 +26,11 @@ const app = new Hono()
       topic === "orders/updated" && webhookOrder.fulfillment_status !== null;
 
     if (isFulfilled) {
-      console.log("Fulfilled order skipping...");
+      console.warn("Fulfilled order skipping...");
       return;
     }
 
-    await limiter.schedule(() =>
-      handleWebhhokOrder({ data: webhookOrder, store })
-    );
+    waitUntil(handleWebhhokOrder({ data: webhookOrder, store }));
 
     console.log(`Scheduled ${topic} event for order ${webhookOrder.name}...`);
 

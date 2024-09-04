@@ -78,7 +78,7 @@ const TaskForm = ({
   const [open, setOpen] = useState(false);
   const [calenderOpen, setCalenderOpen] = useState(false);
   const { data } = useUsersData({
-    roles: ["admin", "employees", "user", "customer"],
+    roles: ["admin", "user"],
   });
   const router = useRouter();
 

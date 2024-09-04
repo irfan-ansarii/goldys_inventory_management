@@ -16,7 +16,7 @@ const NoDataFallback = ({ className }: { className?: string }) => {
         </span>
         <p className="font-semibold">No Data Available</p>
         <p className="text-muted-foreground text-sm">
-          There is no data available for the selected range.
+          No data is available. Please try removing or adjusting the filter.
         </p>
       </div>
     </div>

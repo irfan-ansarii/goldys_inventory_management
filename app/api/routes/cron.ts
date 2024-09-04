@@ -8,6 +8,7 @@ const app = new Hono()
   /**                            PEDNING TASKS                           */
   /********************************************************************* */
   .get("/tasks", async (c) => {
+    console.warn("/api/cron/tasks");
     const { data } = await getTasks({
       statuses: ["pending", "on hold", "in progress"],
     });
@@ -32,6 +33,7 @@ const app = new Hono()
   /**                        SEND STORE SALE REPORTS                      */
   /********************************************************************* */
   .get("/reports", async (c) => {
+    console.warn("/api/cron/reports");
     // get stores
     // get all orders where date is today
     // get transactions
@@ -57,6 +59,7 @@ const app = new Hono()
   /********************************************************************* */
   .get("/tracking", async (c) => {
     // sync status from shiprocket
+    console.warn("/api/cron/tracking");
     return c.json({ success: true }, 200);
   });
 

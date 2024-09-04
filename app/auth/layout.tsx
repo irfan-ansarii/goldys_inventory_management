@@ -21,7 +21,7 @@ async function AuthLayout({ children }: { children: React.ReactNode }) {
           alt="Image"
           width="1920"
           height="1080"
-          className="h-full w-full object-cover  dark:grayscale"
+          className="h-full w-full object-cover"
         />
       </div>
     </div>
