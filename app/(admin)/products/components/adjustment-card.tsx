@@ -24,9 +24,6 @@ const AdjustmentCard = ({ data }: { data: AdjustmentType }) => {
               <Badge variant="secondary" className="py-0">
                 {data.variantTitle}
               </Badge>
-              <Badge className="py-0" variant="secondary">
-                {capitalizeText(data.reason!)}
-              </Badge>
             </div>
             <div className="flex gap-2 items-center text-muted-foreground text-xs !mt-2">
               <Tooltip content="Created at">
@@ -66,7 +63,7 @@ const AdjustmentCard = ({ data }: { data: AdjustmentType }) => {
             variant={data?.quantity! > 0 ? "success" : "destructive"}
           >
             {data?.quantity! > 0 ? "+" : "-"}
-            {Math.abs(data?.quantity || 0)} Pieces
+            {Math.abs(data?.quantity || 0)} {capitalizeText(data.reason!)}
           </Badge>
         </div>
       </CardContent>

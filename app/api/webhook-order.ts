@@ -21,13 +21,13 @@ interface ShippingLine {
 }
 interface Props {
   data: Record<string, any>;
-
+  topic: string | undefined;
   store: Record<string, any>;
 }
-export const handleWebhhokOrder = async ({ data, store }: Props) => {
+export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
   const order = await getOrder(undefined, {
     name: data.name,
-    storId: store.id,
+    storeId: store.id,
   });
 
   const client = createAdminRestApiClient({
@@ -38,9 +38,10 @@ export const handleWebhhokOrder = async ({ data, store }: Props) => {
 
   let action = "";
 
-  // update only if processing
   if (order && order.shipmentStatus === "processing") action = "update";
-  if (!order) action = "create";
+  if (!order && topic === "orders/create") action = "create";
+
+  if (!action) return new Promise<void>((res) => res());
 
   /**************
    * Hanlde Order
@@ -143,6 +144,7 @@ export const handleWebhhokOrder = async ({ data, store }: Props) => {
   };
 
   let orderEntity = null;
+
   if (action === "create") orderEntity = await createOrder(createOrderData);
   if (action === "update")
     orderEntity = await updateOrder(order.id, createOrderData);

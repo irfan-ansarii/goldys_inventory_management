@@ -25,11 +25,16 @@ export const upsertOption = async (values: any) => {
   return await createOption(values);
 };
 // get option
-export const getOption = async (key: string, storeId: number) => {
+export const getOption = async (key: string, storeId?: number) => {
   return await db
     .select()
     .from(options)
-    .where(and(eq(options.key, key), eq(options.storeId, storeId)))
+    .where(
+      and(
+        eq(options.key, key),
+        storeId ? eq(options.storeId, storeId) : undefined
+      )
+    )
     .then(findFirst);
 };
 

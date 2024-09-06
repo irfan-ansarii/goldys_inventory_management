@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateReturn, useProcessOrder } from "@/query/orders";
+import { useRouter } from "next/navigation";
 
 import { Loader, Trash2 } from "lucide-react";
 
@@ -14,6 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +30,38 @@ import { DialogTitle } from "@/components/ui/dialog";
 
 import Popup from "@/components/custom-ui/popup";
 import Avatar from "@/components/custom-ui/avatar";
-import { useCreateReturn, useProcessOrder } from "@/query/orders";
-import { useRouter } from "next/navigation";
+
+const couriers = [
+  {
+    name: "Shiprocket",
+    url: "https://goldysnestt.shiprocket.co/tracking/",
+  },
+
+  {
+    name: "Trackon Courier",
+    url: "https://trackon.in/Tracking/t2/MultipleTracking?",
+  },
+  {
+    name: "Blue Dark",
+    url: "https://bluedart.com/tracking?",
+  },
+  {
+    name: "DTDC",
+    url: "https://www.dtdc.in/tracking.asp?",
+  },
+  {
+    name: "DHL",
+    url: "https://www.dhl.com/in-en/home/tracking.html?tracking-id=",
+  },
+  {
+    name: "Aramex",
+    url: "https://www.aramex.com/ae/en/track/shipments?",
+  },
+  {
+    name: "Other",
+    url: "",
+  },
+];
 
 const schema = z.object({
   carrier: z.string(),
@@ -84,6 +123,8 @@ const ProcessPopup = ({ children, orderId, shipmentId, items }: Props) => {
   });
 
   const lineItems = form.watch("lineItems");
+  const courier = form.watch("carrier");
+  const awb = form.watch("awb");
 
   const handleRemove = (index: number) => {
     lineItems.splice(index, 1);
@@ -121,6 +162,11 @@ const ProcessPopup = ({ children, orderId, shipmentId, items }: Props) => {
       );
     }
   };
+
+  React.useEffect(() => {
+    const carrier = couriers.find((c) => c.name === courier);
+    form.setValue("trackingUrl", `${carrier ? `${carrier.url}${awb}` : ""}`);
+  }, [courier, awb]);
 
   return (
     <Popup
@@ -193,10 +239,24 @@ const ProcessPopup = ({ children, orderId, shipmentId, items }: Props) => {
                 name="carrier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Courier </FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
+                    <FormLabel>Courier</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Courier" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {couriers.map((courier) => (
+                          <SelectItem value={courier.name}>
+                            {courier.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -92,8 +92,9 @@ async function drawHeader() {
 
   if (response.ok) {
     const arrayBuffer = await response.arrayBuffer();
-
-    doc.addImage(new Uint8Array(arrayBuffer), left, top, 50, 12);
+    try {
+      doc.addImage(new Uint8Array(arrayBuffer), left, top, 50, 12);
+    } catch (error) {}
   }
 
   doc.setDrawColor(lineColor);

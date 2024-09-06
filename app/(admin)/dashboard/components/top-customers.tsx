@@ -28,20 +28,22 @@ const TopCustomers = async ({
         >
           <div className="flex items-start gap-3 overflow-hidden col-span-2">
             <Avatar src={user.name}></Avatar>
-            <div className="overflow-hidden flex-1">
+            <div className="overflow-hidden flex-1 truncate">
               <Link
                 href={`/orders?q=${user.name}`}
-                className="text-sm leading-tight truncate block"
+                className="text-sm truncate block"
               >
                 {user.name}
               </Link>
-              <span className="text-xs text-muted-foreground truncate">
-                {user.phone}
-              </span>
-              {" - "}
-              <span className="text-xs text-muted-foreground truncate">
-                {user.email}
-              </span>
+              <div className="flex truncate items-center">
+                <span className="text-xs text-muted-foreground ">
+                  {user.phone}
+                </span>
+                {" - "}
+                <span className="text-xs text-muted-foreground">
+                  {user.email}
+                </span>
+              </div>
             </div>
           </div>
           <Progress

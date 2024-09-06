@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { CardTitle } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 
 interface Props {
@@ -8,8 +9,16 @@ interface Props {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   children: React.ReactNode;
   title: string;
+  href: string;
 }
-const IconCard = ({ textColor, iconColor, icon, title, children }: Props) => {
+const IconCard = ({
+  textColor,
+  iconColor,
+  icon,
+  title,
+  children,
+  href,
+}: Props) => {
   const Icon = icon;
 
   return (
@@ -24,12 +33,13 @@ const IconCard = ({ textColor, iconColor, icon, title, children }: Props) => {
       </div>
       <CardTitle>{children}</CardTitle>
 
-      <span
-        className={`text-xs !mt-5 justify-between flex items-center ${textColor}`}
+      <Link
+        href={href}
+        className={`text-xs !mt-5 justify-between hover:underline flex items-center ${textColor}`}
       >
         View More
         <ArrowRight className="w-3 h-3 ml-2" />
-      </span>
+      </Link>
       <span
         className={`absolute right-6 top-6 !mt-0 text-green-600 ${textColor}`}
       >

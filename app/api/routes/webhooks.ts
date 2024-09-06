@@ -3,12 +3,16 @@ import { waitUntil } from "@vercel/functions";
 import { getStores } from "@/drizzle/services/stores";
 import { HTTPException } from "hono/http-exception";
 
-import { limiter } from "@/lib/utils";
+import { eq } from "drizzle-orm";
+import { db } from "@/drizzle/db";
+import { options } from "@/drizzle/schemas/options";
+
 import { handleWebhhokOrder } from "../webhook-order";
+import { handleShiprocketEvent } from "../shiprocket-event";
 
 const app = new Hono()
   /********************************************************************* */
-  /**                            CHANNEL WEBHOOK                            */
+  /**                           SHOPIFY WEBHOOK                          */
   /********************************************************************* */
   .post("/channel", async (c) => {
     const topic = c.req.header("x-shopify-topic");
@@ -30,20 +34,37 @@ const app = new Hono()
       return;
     }
 
-    waitUntil(handleWebhhokOrder({ data: webhookOrder, store }));
+    waitUntil(handleWebhhokOrder({ data: webhookOrder, store, topic }));
 
     console.log(`Scheduled ${topic} event for order ${webhookOrder.name}...`);
 
     return c.json({ success: true }, 200);
   })
+  /********************************************************************* */
+  /**                          SHIPROCKET WEBHOOK                        */
+  /********************************************************************* */
+  .post("/tracking", async (c) => {
+    const key = c.req.header("x-api-key");
+    const payload = await c.req.json();
 
-  .get("/tracking", async (c) => {
-    // handle shiprocket updates
-    limiter.schedule(() => new Promise((res) => res(true)));
+    const opts = await db
+      .select()
+      .from(options)
+      .where(eq(options.key, "shiprocket"));
 
-    const counts = limiter.counts();
+    const configs = opts.reduce((acc, curr) => {
+      const json = JSON.parse(curr.value);
+      acc.push({ ...json, storeId: curr.storeId });
+      return acc;
+    }, [] as Record<string, any>[]);
 
-    console.log(counts);
+    const config = configs.find((s) => s.apiKey === key);
+
+    if (!config || config.apiKey !== key)
+      throw new HTTPException(400, { message: "Invalid key skipping..." });
+
+    waitUntil(handleShiprocketEvent({ storeId: config.storeId, payload }));
+
     return c.json({ success: true }, 200);
   });
 

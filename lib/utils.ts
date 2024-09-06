@@ -94,7 +94,7 @@ export const getShipmentStatusBadgeClassNames = (status: string) => {
     case "rto delivered":
       return "bg-orange-600 hover:bg-orange-700 text-white";
     default:
-      return "";
+      return "bg-primary hover:bg-primary/80 text-primary";
   }
 };
 export const getTaskBadgeClassNames = (status: string) => {

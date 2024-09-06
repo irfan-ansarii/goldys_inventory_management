@@ -37,6 +37,7 @@ const DashboardPage = async ({
           textColor="text-green-600"
           icon={HandCoins}
           title="Income"
+          href="/orders"
         >
           <ErrorBoundary suspenseFallback={<Skeleton className="w-28 h-4" />}>
             <IncomeCard searchParams={searchParams} />
@@ -51,6 +52,7 @@ const DashboardPage = async ({
           textColor="text-red-600"
           icon={FilePenLine}
           title="Expense"
+          href="/expenses"
         >
           <ErrorBoundary suspenseFallback={<Skeleton className="w-28 h-4" />}>
             <ExpenseCard searchParams={searchParams} />
@@ -65,6 +67,7 @@ const DashboardPage = async ({
           textColor="text-orange-600"
           icon={FilePenLine}
           title="Products"
+          href="/products/adjustments"
         >
           <ErrorBoundary suspenseFallback={<Skeleton className="w-28 h-4" />}>
             <ProductCard searchParams={searchParams} />

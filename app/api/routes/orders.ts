@@ -37,6 +37,8 @@ import { HTTPException } from "hono/http-exception";
 import { createOrderInvoice } from "../invoice";
 import { getOption } from "@/drizzle/services/options";
 import { del, put } from "@vercel/blob";
+import { waitUntil } from "@vercel/functions";
+import { fulfill } from "../fulfill-shopify";
 
 export const createSchema = orderCreateSchema
   .omit({
@@ -591,6 +593,9 @@ const app = new Hono()
         // update stocks
         updateStock(storeId, itemsToAdjust),
       ]);
+
+      // process order on shopify
+      waitUntil(fulfill(order.id, storeId));
 
       // TODO schedule order shipped message
 

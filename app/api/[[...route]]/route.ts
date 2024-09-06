@@ -5,6 +5,7 @@ import { jwt } from "hono/jwt";
 import { JwtVariables } from "hono/jwt";
 import { HTTPException } from "hono/http-exception";
 
+import socketHandler from "@/app/api/routes/socket";
 import authHandler from "@/app/api/routes/auth";
 import webhookHandler from "@/app/api/routes/webhooks";
 import uploadHandler from "@/app/api/routes/uploads";
@@ -30,6 +31,7 @@ const app = new Hono<{ Variables: Variables }>().basePath("/api");
 app.use("*", cors());
 
 const routes = app
+  .route("/socket", socketHandler)
   .route("/auth", authHandler)
   .route("/webhooks", webhookHandler)
   .all("/*", jwt({ secret: "secret" }))

@@ -33,7 +33,6 @@ const Sidebar = async ({ className }: { className?: string }) => {
             alt="Logo"
             src={session?.store?.logo as string}
             fill
-            // placeholder="blur"
             className="object-cover"
           />
         </Link>

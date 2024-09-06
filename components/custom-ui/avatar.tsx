@@ -34,7 +34,7 @@ const Avatar = ({ className, fallbackClassName, src, title }: Props) => {
     <AvatarRoot className={cn("border-2", className)}>
       {isSourceString && source && (
         <AvatarImage src={source as string} className="object-cover" asChild>
-          <Image src={source as string} alt="logo" width={40} height={40} />
+          <Image src={source as string} alt="image" width={40} height={40} />
         </AvatarImage>
       )}
 

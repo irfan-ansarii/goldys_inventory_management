@@ -11,6 +11,7 @@ import { Check, ChevronDown, ListFilter, PlusCircle } from "lucide-react";
 import SearchBar from "@/components/search-bar";
 
 import { useRouterStuff } from "@/hooks/use-router-stuff";
+import { getShipmentStatusBadgeClassNames } from "@/lib/utils";
 
 const paymentStatus = [
   { label: "All", value: "" },
@@ -142,6 +143,11 @@ const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
                     size: "sm",
                   })}
                 >
+                  <span
+                    className={`w-2 h-2 mr-2 rounded-full ${getShipmentStatusBadgeClassNames(
+                      path.value
+                    )}`}
+                  ></span>
                   {path.label}
                   <Check
                     className={`w-4 h-4 text-muted-foreground ml-auto ${
