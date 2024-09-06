@@ -251,7 +251,7 @@ const ProcessPopup = ({ children, orderId, shipmentId, items }: Props) => {
                       </FormControl>
                       <SelectContent>
                         {couriers.map((courier) => (
-                          <SelectItem value={courier.name}>
+                          <SelectItem value={courier.name} key={courier.name}>
                             {courier.name}
                           </SelectItem>
                         ))}
