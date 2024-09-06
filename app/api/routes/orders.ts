@@ -595,7 +595,7 @@ const app = new Hono()
       ]);
 
       // process order on shopify
-      waitUntil(fulfill(order.id, storeId));
+      waitUntil(fulfill({ orderId, storeId, shipment }));
 
       // TODO schedule order shipped message
 

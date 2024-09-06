@@ -47,6 +47,7 @@ const app = new Hono()
     const key = c.req.header("x-api-key");
     const payload = await c.req.json();
 
+    console.log("shiprocket webhook event::", payload);
     const opts = await db
       .select()
       .from(options)
