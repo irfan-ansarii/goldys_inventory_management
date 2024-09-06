@@ -829,14 +829,10 @@ const app = new Hono()
       throw new HTTPException(404, { message: "Shipment cannot be cancelled" });
     }
 
-    // handle return shipment
     if (shipment.kind === "return") {
       const [updatedShipment] = await Promise.all([
-        // update shipment
-        updateShipment(shipmentId, { status: "cancelled" }),
-        // update parenr shipment
+        updateShipment(shipmentId, { status: "cancelled", actions: [] }),
         updateShipment(shipment.parentId, { actions: ["return"] }),
-        // update order
         updateOrder(orderId, {
           shipmentStatus: "delivered",
           tags: [...order.tags!, "return cancelled"],
@@ -863,7 +859,7 @@ const app = new Hono()
 
     await Promise.all([
       // update shipemnt
-      updateShipment(shipmentId, { status: "cancelled" }),
+      updateShipment(shipmentId, { status: "cancelled", actions: [] }),
       // update order
       updateOrder(orderId, {
         shipmentStatus: "processing",

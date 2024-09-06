@@ -3,8 +3,25 @@ import React from "react";
 
 import Avatar from "@/components/custom-ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useStream } from "@/hooks/use-stream";
+import { Button } from "@/components/ui/button";
+import { publishNotification } from "@/hooks/use-publish-redis";
 
 const Cart = () => {
+  const stream = useStream();
+
+  console.log(stream);
+
+  const publish = async () => {
+    await Promise.all([
+      publishNotification({
+        name: "hello",
+        topic: "testing",
+        date: new Date(),
+      }),
+    ]);
+  };
+
   return (
     <div className="flex flex-col justify-center h-full gap-4">
       <h2 className="bg-gradient-to-r from-lime-500 via-orange-600 to-lime-500 bg-clip-text text-transparent text-4xl font-semibold">
@@ -20,6 +37,8 @@ const Cart = () => {
         <p>Regards</p>
         <p>Team Awesome Company</p>
       </div>
+
+      <Button onClick={publish}>Test Redis</Button>
     </div>
   );
 

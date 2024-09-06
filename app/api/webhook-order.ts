@@ -333,26 +333,23 @@ const getChannelTransactions = async (
   client: AdminRestApiClient,
   orderId: string | number
 ) => {
-  let success = false;
-  let transactions: Record<string, any>[] = [];
+  try {
+    const res = await client.get(`orders/${orderId}/transactions`, {
+      retries: 2,
+    });
 
-  while (!success) {
-    try {
-      const res = await client.get(`orders/${orderId}/transactions`);
-
-      if (res.ok) {
-        const data = (await res.json()) as {
-          transactions: Record<string, any>[];
-        };
-        transactions = data.transactions;
-        success = true;
-      }
-    } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (res.ok) {
+      const data = (await res.json()) as {
+        transactions: Record<string, any>[];
+      };
+      return data.transactions;
+    } else {
+      return [];
     }
+  } catch (error) {
+    console.log("Error while fetching transactions skipping...");
+    return [];
   }
-
-  return transactions;
 };
 
 // get image from shopify
@@ -360,23 +357,20 @@ const getChannelProductImages = async (
   client: AdminRestApiClient,
   productId: string | number
 ) => {
-  let image = "";
-  let success = false;
-  while (!success) {
-    try {
-      const res = await client.get(`products/${productId}/images`);
+  try {
+    const res = await client.get(`products/${productId}/images`, {
+      retries: 2,
+    });
 
-      if (res.ok) {
-        const { images } = (await res.json()) as {
-          images: Record<string, any>[];
-        };
-        if (images.length > 0) image = images[0].src;
-
-        success = true;
-      }
-    } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (res.ok) {
+      const { images } = (await res.json()) as {
+        images: Record<string, any>[];
+      };
+      return images?.[0]?.src || "";
     }
+    return "";
+  } catch (error) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return "";
   }
-  return image;
 };

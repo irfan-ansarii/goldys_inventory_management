@@ -207,7 +207,7 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
               <div className="whitespace-pre-line">{order.notes}</div>
             )}
             {order.tags && order.tags.length > 0 && (
-              <div className="space-x-2">
+              <div className="flex gap-3 flex-wrap">
                 {order.tags?.map((tag) => (
                   <Badge
                     variant="outline"
