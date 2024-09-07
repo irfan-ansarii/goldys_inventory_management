@@ -89,12 +89,9 @@ async function drawHeader() {
   const { width, top, right, left, doc, logo, company } = config;
 
   const response = await fetch(logo);
-
   if (response.ok) {
     const arrayBuffer = await response.arrayBuffer();
-    try {
-      doc.addImage(new Uint8Array(arrayBuffer), left, top, 50, 12);
-    } catch (error) {}
+    doc.addImage(new Uint8Array(arrayBuffer), "avif", left, top, 50, 12);
   }
 
   doc.setDrawColor(lineColor);

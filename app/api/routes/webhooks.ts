@@ -48,20 +48,15 @@ const app = new Hono()
     const payload = await c.req.json();
 
     console.log("shiprocket webhook event::", payload);
+
     const opts = await db
       .select()
       .from(options)
-      .where(eq(options.key, "shiprocket"));
+      .where(eq(options.key, "shiprocket-api-key"));
 
-    const configs = opts.reduce((acc, curr) => {
-      const json = JSON.parse(curr.value);
-      acc.push({ ...json, storeId: curr.storeId });
-      return acc;
-    }, [] as Record<string, any>[]);
+    const config = opts.find((s) => s.value === key);
 
-    const config = configs.find((s) => s.apiKey === key);
-
-    if (!config || config.apiKey !== key)
+    if (!config || config.value !== key)
       throw new HTTPException(400, { message: "Invalid key skipping..." });
 
     waitUntil(handleShiprocketEvent({ storeId: config.storeId, payload }));

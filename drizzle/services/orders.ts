@@ -242,6 +242,15 @@ export const getShipment = async (shipmentId: any) => {
     .then(findFirst);
 };
 
+// get shipment
+export const getShipmentByAWB = async (awb: any) => {
+  return await db
+    .select()
+    .from(shipments)
+    .where(eq(shipments.awb, awb))
+    .then(findFirst);
+};
+
 // get shipments
 export const getShipments = async (orderId: any) => {
   return await db

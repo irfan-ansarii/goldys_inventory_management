@@ -595,7 +595,13 @@ const app = new Hono()
       ]);
 
       // process order on shopify
-      waitUntil(fulfill({ orderId, storeId, shipment }));
+      waitUntil(
+        fulfill({
+          orderId,
+          storeId,
+          shipment: { ...shipment, status: "in_transit" },
+        })
+      );
 
       // TODO schedule order shipped message
 
@@ -740,6 +746,14 @@ const app = new Hono()
           }),
         ]);
 
+        // process order on shopify
+        waitUntil(
+          fulfill({
+            orderId,
+            storeId,
+            shipment: { ...shipment, status: "failure" },
+          })
+        );
         return c.json({ data: updatedShipment, success: true }, 200);
       }
 
@@ -758,6 +772,16 @@ const app = new Hono()
             tags: [...order.tags!, "delivered"],
           }),
         ]);
+
+        // process order on shopify
+        waitUntil(
+          fulfill({
+            orderId,
+            storeId,
+            shipment: { ...shipment, status: "delivered" },
+          })
+        );
+
         // TODO schedule message/email
         return c.json({ data: updatedShipment, success: true }, 200);
       }

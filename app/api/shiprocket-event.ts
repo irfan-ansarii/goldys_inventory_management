@@ -1,6 +1,6 @@
 import {
   getOrder,
-  getShipments,
+  getShipmentByAWB,
   updateOrder,
   updateShipment,
 } from "@/drizzle/services/orders";
@@ -10,32 +10,39 @@ interface Props {
   payload: Record<string, any>;
 }
 export const handleShiprocketEvent = async ({ storeId, payload }: Props) => {
-  const order = await getOrder(undefined, {
-    name: payload.channel_order_id,
-    storeId: storeId,
-  });
+  const {
+    order_id,
+    current_status: status,
+    courier_name: carrier,
+    awb,
+  } = payload;
+
+  const shipment = await getShipmentByAWB(awb);
+
+  // if there is shipment with awb then update it and return
+  if (shipment) {
+    return await Promise.all([
+      updateShipment(shipment.id, { status: mapStatus(status) }),
+      updateOrder(shipment.orderId, { status: mapStatus(status) }),
+    ]);
+  }
+
+  const order = await getOrder(undefined, { name: order_id, storeId: storeId });
 
   if (!order) return new Promise((res) => res(true));
 
-  const { current_status: status, courier_name: carrier, awb } = payload;
+  // if shipment is not already created
+  // create shipment
 
-  const shipments = await getShipments(order.id);
-
-  const shipmentToBeUpdated = shipments.find((sh) => sh.awb === awb);
-
-  // if shipment is already created
-
-  if (shipmentToBeUpdated) {
-    const mappedStatus = mapStatus(status);
-    return await Promise.all([
-      updateShipment(shipmentToBeUpdated.id, {
-        status: mappedStatus,
-      }),
-      updateOrder(order.id, {
-        shipmentStatus: mappedStatus,
-      }),
-    ]);
-  }
+  // const mappedStatus = mapStatus(status);
+  // return await Promise.all([
+  //   updateShipment(shipmentToBeUpdated.id, {
+  //     status: mappedStatus,
+  //   }),
+  //   updateOrder(order.id, {
+  //     shipmentStatus: mappedStatus,
+  //   }),
+  // ]);
 
   // create shipment
 

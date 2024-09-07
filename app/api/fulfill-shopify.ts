@@ -13,6 +13,17 @@ export const fulfill = async ({ orderId, storeId, shipment }: any) => {
   });
 
   const channelOrderId = (order.additionalMeta as Record<string, any>)?.id;
+
+  // if order is already fulfilled
+  const fulfillments = await fetchFulfillments(client, channelOrderId);
+
+  const successFulfillments = fulfillments.filter((f) => f.status == "success");
+
+  if (successFulfillments.length > 0) {
+    return await createEvent(client, fulfillments, shipment.status);
+  }
+
+  // create fulfillments
   const fulfillmentOrders = await fetchFulfillmentOrders(
     client,
     channelOrderId
@@ -22,14 +33,16 @@ export const fulfill = async ({ orderId, storeId, shipment }: any) => {
     f.supported_actions.includes("create_fulfillment")
   );
 
-  // TODO if no fulfillment orders to create then fetch fulfillment and create ovent on that
-  const fulfillments = await processFulfillments(client, filtered, shipment);
-
-  return await createEvent(client, fulfillments);
+  const createdFulfillments = await processFulfillments(
+    client,
+    filtered,
+    shipment
+  );
+  return await createEvent(client, createdFulfillments, shipment.status);
 };
 
 /**
- * fetch all fulfillment orders
+ * fetch fulfillment orders
  * @param client
  * @param orderId
  * @returns
@@ -49,11 +62,36 @@ async function fetchFulfillmentOrders(client: any, orderId: string) {
       return [];
     }
   } catch (error) {
-    console.log("Error while fetching the fulfillment order skipping...");
+    console.warn("Error while fetching the fulfillment order skipping...");
     return [];
   }
 }
 
+/**
+ * fetch fulfillments
+ * @param client
+ * @param orderId
+ * @returns
+ */
+async function fetchFulfillments(client: any, orderId: string) {
+  try {
+    const res = await client.get(`orders/${orderId}/fulfillments`, {
+      retries: 2,
+    });
+
+    if (res.ok) {
+      const data = (await res.json()) as {
+        fulfillments: Record<string, any>[];
+      };
+      return data.fulfillments;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.warn("Error while fetching the fulfillments skipping...");
+    return [];
+  }
+}
 /**
  * create fulfillment on shopify
  * @param client
@@ -107,7 +145,7 @@ async function processFulfillments(
           return {};
         }
       } catch (error) {
-        console.log("Error while fulfilling shopify order skipping...");
+        console.warn("Error while fulfilling shopify order skipping...");
         return {};
       }
     })
@@ -123,7 +161,8 @@ async function processFulfillments(
  */
 const createEvent = async (
   client: any,
-  fulfillments: Record<string, any>[]
+  fulfillments: Record<string, any>[],
+  status: string
 ) => {
   const results = await Promise.all(
     fulfillments.map(async (f) => {
@@ -133,7 +172,7 @@ const createEvent = async (
           {
             data: {
               event: {
-                status: "in_transit",
+                status,
               },
             },
           },
