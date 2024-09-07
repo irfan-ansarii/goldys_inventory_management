@@ -31,7 +31,8 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
   const { id } = params;
   const { data: order } = await getOrder(id);
   const { data: transactions } = await getTransactions(id);
-  const { lineItems, processing, shipments } = order;
+  const { lineItems, processing, shipments, charges } = order;
+  const charge = charges as Record<string, any>;
   const className = getOrderBadgeClassNames(order.paymentStatus!);
   const products = lineItems.filter((line) => !line.requiresShipping);
 
@@ -121,12 +122,28 @@ const OrderPage = async ({ params }: { params: { id: string } }) => {
             </div>
             <div>
               <span>Discount</span>
-              <span>{formatNumber(order.discount)}</span>
+              <span>
+                {formatNumber(
+                  parseFloat(order.discount || "0") > 0
+                    ? -order.discount
+                    : order.discount
+                )}
+              </span>
             </div>
             <div>
               <span>Tax</span>
               <span>{formatNumber(order.tax)}</span>
             </div>
+            {charge?.amount && (
+              <div>
+                <span>
+                  {charge.reason.startsWith("Standard")
+                    ? "Shipping"
+                    : charge.reason}
+                </span>
+                <span>{formatNumber(charge.amount)}</span>
+              </div>
+            )}
             <div className="text-lg font-semibold">
               <span>Total</span>
               <span>{formatNumber(order.total)}</span>

@@ -315,7 +315,8 @@ function drawTableRow<
 function drawTableTotal(order: OrderType) {
   const { width, right, left, doc } = config;
 
-  const { subtotal, discount, total, due, taxLines = [] } = order;
+  const { subtotal, discount, charges, total, due, taxLines = [] } = order;
+  const charge = charges as Record<string, any>;
   let y = 161;
 
   const totals = [
@@ -335,6 +336,15 @@ function drawTableTotal(order: OrderType) {
       { text: formatNumber(tax.amount), align: "right" },
     ]);
   });
+
+  if (charge?.amount > 0) {
+    totals.push([
+      {
+        text: charge.reason.startsWith("Standard") ? "Shipping" : charge.reason,
+      },
+      { text: formatNumber(charge.amount), align: "right" },
+    ]);
+  }
 
   totals.forEach((row) => {
     let x = width - left - 50;
