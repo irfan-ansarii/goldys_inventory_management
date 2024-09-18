@@ -18,6 +18,7 @@ import ProductCard from "./components/product-card";
 import { FilePenLine, HandCoins } from "lucide-react";
 import IconCard from "./components/icon-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { seedCustomer } from "@/lib/seed";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -28,6 +29,8 @@ const DashboardPage = async ({
 }: {
   searchParams: { [k: string]: string };
 }) => {
+  await seedCustomer();
+
   return (
     <div className="grid grid-cols-6 gap-4 md:gap-6 [&>div]:relative">
       {/* income card */}

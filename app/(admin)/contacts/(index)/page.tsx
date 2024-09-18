@@ -15,6 +15,7 @@ const ContactsPage = async ({
 }) => {
   const { data, meta } = await getUsers({
     roles: ["customer", "supplier", "employee"],
+    ...searchParams,
   });
 
   return (
