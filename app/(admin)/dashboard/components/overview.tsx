@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { getOverview } from "@/query/dashboard";
 import OverviewChart from "./charts/overview";
 import EmptyState from "./empty-state";
+
 const formatDate = (interval: string, value: string) => {
   if (interval === "today" || interval === "yesterday") {
     return format(value, "hh:mm a");

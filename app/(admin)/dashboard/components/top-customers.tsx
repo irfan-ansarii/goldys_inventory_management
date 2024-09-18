@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { getCustomersOverview } from "@/query/dashboard";
+import { getCustomersOverview, getOverview } from "@/query/dashboard";
 import { formatNumber } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import Avatar from "@/components/custom-ui/avatar";
@@ -12,9 +12,10 @@ const TopCustomers = async ({
   searchParams: { [k: string]: string };
 }) => {
   const { interval = "today" } = searchParams;
+  const { data: totals } = await getOverview(interval);
   const { data } = await getCustomersOverview(interval);
 
-  const max = Math.max(...data.map((d) => parseFloat(d.total!)));
+  const max = Math.max(...totals.map((t) => parseFloat(t.sale!)));
 
   if (!data || data.length === 0) {
     return <EmptyState />;

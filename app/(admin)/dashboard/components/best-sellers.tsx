@@ -12,7 +12,10 @@ const BestSellers = async ({
   const { interval = "today" } = searchParams;
   const { data } = await getProductsOverview(interval);
 
-  const max = Math.max(...data.map((d) => parseFloat(d.total!)));
+  const max = data.reduce((acc, curr) => {
+    acc += parseFloat(curr.total! || "0");
+    return acc;
+  }, 0);
 
   if (!data || data.length === 0) {
     return <EmptyState />;

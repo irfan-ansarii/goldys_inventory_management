@@ -36,7 +36,7 @@ const app = new Hono()
 
     waitUntil(handleWebhhokOrder({ data: webhookOrder, store, topic }));
 
-    console.log(`Scheduled ${topic} event for order ${webhookOrder.name}...`);
+    console.log(`Event ${topic} order ${webhookOrder.name}...`);
 
     return c.json({ success: true }, 200);
   })
