@@ -22,7 +22,8 @@ const OrderCart = ({
   className?: string;
   calculateCart: () => void;
 }) => {
-  const { setValue, register, control } = useFormContext<OrderFormValues>();
+  const { setValue, register, control, getValues } =
+    useFormContext<OrderFormValues>();
 
   const [cartLineItems, subtotal, discount, taxType, tax, charges, total] =
     useWatch({
@@ -51,7 +52,6 @@ const OrderCart = ({
     const { currentQuantity, quantity, requiresShipping, shippingQuantity } =
       cartLineItems[index];
 
-    // TODO fix quantity issues
     let fulfilled = 0;
     if (requiresShipping) {
       fulfilled = (quantity || 0) - (shippingQuantity || 0);
@@ -100,64 +100,8 @@ const OrderCart = ({
           <span>{formatNumber(subtotal || 0)}</span>
         </div>
         <div className="flex justify-between">
-          <Popup
-            variant="popover"
-            content={
-              <div className="p-2 space-y-2 md:w-56">
-                <Label>Discount Type</Label>
-                <RadioGroup
-                  defaultValue="fixed"
-                  {...(register("discountLines.type"),
-                  {
-                    onValueChange: (e) => setValue("discountLines.type", e),
-                  })}
-                >
-                  <Label className="relative flex-1 pl-6">
-                    <RadioGroupItem value="fixed" className="absolute left-0" />
-                    Fixed
-                  </Label>
+          <span>Discount</span>
 
-                  <Label className="relative flex-1 pl-6">
-                    <RadioGroupItem
-                      value="percentage"
-                      className="absolute left-0"
-                    />
-                    Percentage
-                  </Label>
-                </RadioGroup>
-
-                {/* <Label className="!mt-3 block">Apply on</Label>
-                <RadioGroup
-                  defaultValue="fixed"
-                  {...(register("discountLines.kind"),
-                  {
-                    onValueChange: (e) => setValue("discountLines.kind", e),
-                  })}
-                >
-                  <Label className="relative flex-1 pl-6">
-                    <RadioGroupItem value="fixed" className="absolute left-0" />
-                    Cart Items
-                  </Label>
-                  <Label className="relative flex-1 pl-6">
-                    <RadioGroupItem value="cart" className="absolute left-0" />
-                    Order Amount
-                  </Label>
-                </RadioGroup> */}
-                <div className="space-y-1.5">
-                  <Label>Reason/Coupon</Label>
-                  <Input {...register("discountLines.reason")} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Amount</Label>
-                  <Input {...register("discountLines.amount")} />
-                </div>
-              </div>
-            }
-          >
-            <span className="inline-flex items-center gap-2 cursor-pointer select-none">
-              Discount <Pencil className="w-3.5 h-3.5" />
-            </span>
-          </Popup>
           <span>{formatNumber(discount || 0)}</span>
         </div>
         <div className="flex justify-between">
@@ -167,7 +111,7 @@ const OrderCart = ({
               <div className="p-2 space-y-2 md:w-56">
                 <div className="font-medium">Tax</div>
                 <RadioGroup
-                  defaultValue="included"
+                  defaultValue={getValues("taxKind.type")}
                   {...(register("taxKind.type"),
                   {
                     onValueChange: (e) => setValue("taxKind.type", e),
@@ -191,7 +135,7 @@ const OrderCart = ({
                 </RadioGroup>
                 <Label className="block !mt-3">Sale Type</Label>
                 <RadioGroup
-                  defaultValue="state"
+                  defaultValue={getValues("taxKind.saleType")}
                   {...(register("taxKind.saleType"),
                   { onValueChange: (e) => setValue("taxKind.saleType", e) })}
                 >
