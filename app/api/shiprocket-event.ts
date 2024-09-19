@@ -25,7 +25,7 @@ export const handleShiprocketEvent = async ({ storeId, payload }: Props) => {
 
   const shipment = await getShipmentByAWB(awb);
 
-  const mappedStatus = mapStatus(status?.toLowerCase(), shipment.kind || "");
+  const mappedStatus = mapStatus(status?.toLowerCase(), shipment?.kind || "");
 
   // if there is shipment with awb then update and return
   if (shipment) {
