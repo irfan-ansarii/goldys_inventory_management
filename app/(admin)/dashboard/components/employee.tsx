@@ -13,7 +13,7 @@ const Employee = async ({
   const { data } = await getEmployeesOverview(interval);
 
   const chartData = data.map((emp, i) => ({
-    name: emp.name,
+    name: emp.name || "NA",
     total: parseFloat(emp.total || "0"),
     fill: CHART_COLORS[i % CHART_COLORS.length],
   }));

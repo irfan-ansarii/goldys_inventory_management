@@ -29,7 +29,7 @@ const IconCard = ({
         >
           <Icon className="w-5 h-5" />
         </span>
-        {title}
+        <span className="font-semibold"> {title}</span>
       </div>
       <CardTitle>{children}</CardTitle>
 
