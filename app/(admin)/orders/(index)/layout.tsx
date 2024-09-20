@@ -77,7 +77,7 @@ const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex flex-col md:flex-row mb-6 justify-end gap-2">
         <Popup
           content={
-            <div className="md:w-52 flex flex-col [&>*]:justify-start">
+            <div className="md:w-44 flex flex-col [&>*]:justify-start">
               {paymentStatus.map((path) => (
                 <Link
                   key={path.value}

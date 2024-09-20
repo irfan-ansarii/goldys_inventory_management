@@ -113,3 +113,16 @@ export const getAdjustmentsOverview = async (interval: string) => {
   }
   return result;
 };
+export const getShipmentsOverview = async (interval: string) => {
+  const client = await getClient();
+
+  const response = await client.api.dashboard.shipments.$get({
+    query: { interval },
+  });
+  const result = await response.json();
+
+  if (!result.success) {
+    throw result;
+  }
+  return result;
+};

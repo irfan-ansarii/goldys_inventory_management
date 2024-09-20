@@ -18,6 +18,7 @@ import ProductCard from "./components/product-card";
 import IconCard from "./components/icon-card";
 import OrdersCard from "./components/orders-card";
 import EmptyState from "./components/empty-state";
+import Shipments from "./components/shipments";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -120,10 +121,10 @@ const DashboardPage = async ({
           <CardTitle className="text-lg">Shipments</CardTitle>
         </CardHeader>
         <CardContent className="pt-2 min-h-44">
-          {/* <ErrorBoundary>
-            <Overview searchParams={searchParams} />
-          </ErrorBoundary> */}
-          <EmptyState />
+          <ErrorBoundary>
+            <Shipments searchParams={searchParams} />
+          </ErrorBoundary>
+          {/* <EmptyState /> */}
         </CardContent>
       </Card>
 

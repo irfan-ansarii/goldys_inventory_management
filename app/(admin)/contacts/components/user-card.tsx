@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Avatar from "@/components/custom-ui/avatar";
 import Actions from "./actions";
+import { capitalizeText } from "@/lib/utils";
 
 const UserCard = ({ user }: { user: UserType }) => {
   return (
@@ -15,7 +16,9 @@ const UserCard = ({ user }: { user: UserType }) => {
           <Avatar src={user.name} />
 
           <div className="space-y-1 overflow-hidden">
-            <h2 className="font-medium text-sm truncate">{user.name}</h2>
+            <h2 className="font-medium text-sm truncate">
+              {capitalizeText(user.name)}
+            </h2>
             <div className="text-muted-foreground flex flex-col md:flex-row md:items-center text-sm md:gap-2">
               {user.phone && (
                 <p className="truncate leading-tight">{user.phone}</p>

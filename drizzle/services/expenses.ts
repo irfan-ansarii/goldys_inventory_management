@@ -48,11 +48,7 @@ export const getExpenses = async (params?: Record<string, any>) => {
     storeId ? eq(expenses.storeId, storeId) : undefined,
     cat ? ilike(expenses.category, `%${cat}%`) : undefined,
     q
-      ? or(
-          ilike(expenses.title, `%${q}%`),
-          ilike(expenses.category, `%${q}%`),
-          ilike(expenses.notes, `%${q}%`)
-        )
+      ? or(ilike(expenses.title, `%${q}%`), ilike(expenses.notes, `%${q}%`))
       : undefined
   );
 

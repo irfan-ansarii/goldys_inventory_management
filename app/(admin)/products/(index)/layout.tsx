@@ -110,7 +110,7 @@ const ProductsLayout = ({ children }: { children: React.ReactNode }) => {
           >
             <span className="inline-flex items-center">
               <ListFilter className="w-4 h-4 mr-2" />
-              {capitalizeText(statusFilter || "Status")}
+              {capitalizeText(statusFilter || "All")}
             </span>
             <ChevronDown className="w-4 h-4" />
           </Button>

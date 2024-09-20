@@ -55,6 +55,7 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
     shipping_address,
     total_line_items_price /** subtotal */,
     current_total_discounts /** disocunt */,
+    discount_applications /** discount codes */,
     current_total_tax /** tax */,
     current_total_price /** total */,
     total_outstanding /** due */,
@@ -135,10 +136,12 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
     due: total_outstanding,
     taxKind,
     taxLines,
+    discountLines: {
+      reason: discount_applications?.map((app: any) => app.code).join(" "),
+      amount: current_total_discounts,
+    },
     notes: note,
-    ...(action === "create"
-      ? { shipmentStatus: "processing" }
-      : { shipmentStatus: order.shipmentStatus }),
+    ...(action === "create" ? { shipmentStatus: "processing" } : {}),
     ...(cancelled_at && { shipmentStatus: "cancelled" }),
     createdAt: parseISO(processed_at),
     cancelledAt: cancelled_at ? parseISO(cancelled_at) : null,
@@ -216,7 +219,7 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
       properties,
       quantity,
       price,
-      total_discount,
+      discount_allocations,
       current_quantity,
       requires_shipping,
       fulfillable_quantity,
@@ -250,6 +253,11 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
       { taxLines: [], tax: 0 }
     );
 
+    const lineDiscount =
+      (discount_allocations as Record<string, any>[])?.reduce((acc, curr) => {
+        return acc + parseFloat(curr.amount);
+      }, 0) ?? 0;
+
     createLineItemsData.push({
       storeId: store.id,
       orderId: orderEntity?.id,
@@ -268,11 +276,9 @@ export const handleWebhhokOrder = async ({ data, store, topic }: Props) => {
       requiresShipping: requires_shipping,
       shippingQuantity: fulfillable_quantity,
       subtotal: formatValue(price * (current_quantity || quantity)),
-      discount: total_discount,
+      discount: lineDiscount,
       tax,
-      total: formatValue(
-        price * (current_quantity || quantity) - total_discount
-      ),
+      total: formatValue(price * (current_quantity || quantity) - lineDiscount),
       taxLines,
       properties,
     });

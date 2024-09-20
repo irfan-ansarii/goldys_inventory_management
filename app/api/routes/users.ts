@@ -78,8 +78,8 @@ const app = new Hono()
     const query = c.req.query();
 
     const { data, meta } = await getUsers({
-      roles,
       ...query,
+      roles,
     });
 
     const sanitized = sanitizeOutput(data, ["password", "otp"]);

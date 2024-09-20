@@ -44,14 +44,15 @@ export async function getUser(id: any, params?: Record<string, any>) {
 
 export async function getUsers(params: Record<string, any>) {
   const { storeId, ids, roles, q, page = 1, limit = PAGE_LIMIT } = params;
-
+  console.log(ids, roles);
   const filters = and(
     storeId ? eq(users.storeId, storeId) : undefined,
-    roles && roles.length > 0 ? inArray(users.role, roles) : undefined,
+    roles ? inArray(users.role, roles) : undefined,
     ids ? inArray(users.id, ids) : undefined,
     q
       ? or(
           ilike(users.name, `%${q}%`),
+          ilike(users.phone, `%${q}%`),
           ilike(users.email, `%${q}%`),
           ilike(users.role, `%${q}%`)
         )

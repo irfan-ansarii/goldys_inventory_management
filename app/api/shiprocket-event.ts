@@ -29,27 +29,45 @@ export const handleShiprocketEvent = async ({ storeId, payload }: Props) => {
 
   // if there is shipment with awb then update and return
   if (shipment) {
+    // if shipment is cancelled
+    if (shipment.status === "cancelled") return new Promise((res) => res(true));
+
     let actions = ["edit", "cancel", "complete", "rto"];
     if (mappedStatus === "delivered") {
       actions = ["return"];
     } else if (mappedStatus === "rto initiated") {
       actions = ["edit", "complete"];
+    } else if (mappedStatus === "cancelled") {
+      actions = [];
     }
+
     return await Promise.all([
-      updateShipment(shipment.id, { status: mappedStatus }),
-      updateOrder(shipment.orderId, { status: mappedStatus, actions }),
+      updateShipment(shipment.id, { status: mappedStatus, actions }),
+      updateOrder(shipment.orderId, { status: mappedStatus }),
     ]);
+  }
+
+  if (mappedStatus === "cancelled") {
+    console.warn("cancelled order skipping...");
+    return new Promise((res) => res(true));
   }
 
   // incase the shipment is not already created then create shipment and update its tracking
   const order = await getOrder(undefined, { name: order_id, storeId: storeId });
+
+  if (!order || order?.shipmentStatus === "cancelled") {
+    console.warn("order not found/cancelled order skipping...");
+    return new Promise((res) => res(true));
+  }
+
   const orderLineItems = await getLineItems(order.id);
+
   const lineItems = orderLineItems.filter(
     (item) => item.requiresShipping && item.shippingQuantity! > 0
   );
 
   if (!order || lineItems.length === 0) {
-    console.warn("Order/pending line-items not found skipping...");
+    console.warn("Order/line-items not found skipping...");
     return new Promise((res) => res(true));
   }
 
@@ -128,6 +146,9 @@ const mapStatus = (status: string, kind: string) => {
     case "rto in transit":
     case "rto_ofd":
       return "rto initiated";
+    case "cancelled":
+      return status;
+    default:
+      return null;
   }
-  return status;
 };

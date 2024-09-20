@@ -1,7 +1,21 @@
 import { db, findFirst } from "../db";
-import { and, between, desc, eq, gte, lte, sql, sum } from "drizzle-orm";
+import {
+  and,
+  between,
+  count,
+  countDistinct,
+  desc,
+  eq,
+  getTableColumns,
+  gte,
+  lte,
+  ne,
+  notInArray,
+  sql,
+  sum,
+} from "drizzle-orm";
 import { INTERVAL_MAP, IntervalKey } from "@/app/api/utils";
-import { lineItems, orders, transactions } from "../schemas/orders";
+import { lineItems, orders, shipments, transactions } from "../schemas/orders";
 import { purchase, purchaseTransactions } from "../schemas/purchase";
 import { expenses } from "../schemas/expenses";
 import { users } from "../schemas/users";
@@ -30,7 +44,12 @@ export const getOverview = async (interval: IntervalKey, storeId: any) => {
           sql`day`,
           sql`day + ${map.interval}::interval`
         ),
-        eq(orders.storeId, storeId)
+        eq(orders.storeId, storeId),
+        notInArray(orders.shipmentStatus, [
+          "cancelled",
+          "rto initiated",
+          "rto delivered",
+        ])
       )
     )
     .leftJoin(
@@ -237,4 +256,49 @@ export const getAdjustmentsOverview = async (
     .from(adjustments)
     .where(filters)
     .then(findFirst);
+};
+
+export const getShipmentsOverview = async (
+  interval: IntervalKey,
+  storeId: any
+) => {
+  const map = INTERVAL_MAP[interval];
+
+  const filters = and(
+    between(
+      orders.createdAt,
+      sql`${map.start}::timestamptz`,
+      sql`${map.end}::timestamptz`
+    ),
+    eq(orders.storeId, storeId)
+  );
+
+  const filtersShipment = and(
+    between(
+      shipments.updatedAt,
+      sql`${map.start}::timestamptz`,
+      sql`${map.end}::timestamptz`
+    ),
+    eq(shipments.storeId, storeId),
+    ne(shipments.status, "cancelled")
+  );
+
+  const pending = await db
+    .select({
+      createdAt: orders.createdAt,
+      total: count(orders.id),
+    })
+    .from(orders)
+    .where(filters)
+    .groupBy(orders.createdAt);
+
+  const shipment = await db
+    .select({
+      name: shipments.status,
+      total: countDistinct(shipments.id),
+    })
+    .from(shipments)
+    .where(filtersShipment)
+    .groupBy(shipments.status);
+  return { shipment, pending };
 };

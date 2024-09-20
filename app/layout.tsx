@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <ReactQueryProvider>
       <html lang="en">
-        <body className={`${inter.className}`}>
+        <body className={`${inter.className} text-sm`}>
           <NextTopLoader />
           <Provider
             attribute="class"
