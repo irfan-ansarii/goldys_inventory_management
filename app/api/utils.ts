@@ -70,6 +70,7 @@ export const INTERVAL_MAP = {
 };
 export type IntervalKey = keyof typeof INTERVAL_MAP;
 export const PAGE_LIMIT = 20;
+
 export const sanitizeOutput = <T extends SanitizeProps>(
   data: T | T[],
   fieldsToExclude: (keyof T)[]
