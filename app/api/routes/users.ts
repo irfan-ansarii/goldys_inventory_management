@@ -85,7 +85,7 @@ const app = new Hono()
     const sanitized = sanitizeOutput(data, ["password", "otp"]);
     return c.json({
       success: true,
-      sanitized,
+      data: sanitized,
       meta,
     });
   })
