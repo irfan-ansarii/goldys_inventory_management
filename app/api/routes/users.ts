@@ -101,7 +101,7 @@ const app = new Hono()
     const sanitizedStore = sanitizeOutput(store!, ["domain", "token"]);
 
     return c.json({
-      data: { ...sanitizedUser, ...sanitizedStore },
+      data: { ...sanitizedUser, store: sanitizedStore },
       success: true,
     });
   })
