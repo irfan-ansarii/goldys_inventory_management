@@ -69,10 +69,16 @@ const schema = orderCreateSchema
 export type OrderFormValues = z.infer<typeof schema>;
 
 type LineProps = {
+  price: string;
   salePrice: string;
   quantity: number;
+  discount: string;
   currentQuantity: number;
   taxRate: any;
+  discountLine: {
+    type: string;
+    amount: string;
+  };
 };
 type WatchProps = [string, string, string, string, string, string, string];
 
@@ -112,7 +118,7 @@ const OrderForm = ({ defaultValues }: any) => {
   });
 
   const cartLineItems = watch("lineItems");
-  console.log(cartLineItems);
+
   const itemsCount = cartLineItems?.reduce(
     (acc, curr) => (acc += curr.currentQuantity!),
     0
@@ -128,23 +134,34 @@ const OrderForm = ({ defaultValues }: any) => {
     // update the line items and return the calculated cart total
     const totals = cartLineItems.reduce(
       (acc, curr, i) => {
-        const { salePrice, currentQuantity, taxRate } = curr as LineProps;
+        const { salePrice, currentQuantity, discountLine, taxRate } =
+          curr as LineProps;
 
-        const lineSubtotal = parseFloat(salePrice!) * currentQuantity!;
+        const { type, amount } = discountLine;
+
+        const priceNum = parseFloat(salePrice);
+        const amountNum = parseFloat(amount! || "0");
+
+        const lineSubtotal = priceNum * currentQuantity!;
+        const lineDiscount =
+          type === "percentage" ? lineSubtotal * (amountNum / 100) : amountNum;
+        const lineTotal = lineSubtotal - lineDiscount;
 
         const isTaxIncluded = tType === "included";
+
         const lineTax = isTaxIncluded
-          ? lineSubtotal - lineSubtotal / (1 + taxRate! / 100)
-          : lineSubtotal * (taxRate! / 100);
+          ? lineTotal - lineTotal / (1 + taxRate! / 100)
+          : lineTotal * (taxRate! / 100);
 
         setValue(`lineItems.${i}.subtotal`, lineSubtotal.toString());
-
+        setValue(`lineItems.${i}.discount`, lineDiscount.toString());
         setValue(`lineItems.${i}.tax`, lineTax.toString());
-        setValue(`lineItems.${i}.total`, lineSubtotal.toString());
+        setValue(`lineItems.${i}.total`, lineTotal.toString());
 
         acc.subtotal += lineSubtotal;
+        acc.discount += lineDiscount;
         acc.tax += lineTax;
-        acc.total = acc.subtotal + (!isTaxIncluded ? acc.tax : 0);
+        acc.total += lineTotal + (!isTaxIncluded ? acc.tax : 0);
 
         return acc;
       },

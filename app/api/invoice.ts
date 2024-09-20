@@ -9,8 +9,8 @@ import { drawPdfText } from "./utils";
 import { OrderType } from "@/query/orders";
 import { formatNumber } from "@/lib/utils";
 
-const lineColor = "#D7DAE0";
-const headingColor = "#141414";
+const lineColor = "#000000";
+const headingColor = "#000000";
 
 interface StoreTypeProps extends Omit<StoreType, "address"> {
   address: { [k: string]: string };
@@ -104,7 +104,7 @@ async function drawHeader() {
     color: headingColor,
   });
 
-  doc.line(left, 30, width - right, 30);
+  doc.line(left, 24, width - right, 24);
 }
 
 /**
@@ -113,12 +113,12 @@ async function drawHeader() {
 function drawCompanyDetails() {
   const { left, header, doc } = config;
 
-  drawPdfText(doc, "From:", left, 35, {
+  drawPdfText(doc, "From:", left, 30, {
     weight: "bold",
     color: headingColor,
   });
 
-  let y = 40;
+  let y = 35;
   header.forEach((address) => {
     drawPdfText(doc, address, left, y, {});
     y += 3.5;
@@ -133,12 +133,12 @@ function drawCustomerDetails(billing: string[]) {
   const { left, right, width, doc } = config;
   const x = (38 / 100) * (width - (left + right));
 
-  drawPdfText(doc, "Billed To:", x, 35, {
+  drawPdfText(doc, "Billed To:", x, 30, {
     weight: "bold",
     color: headingColor,
   });
 
-  let y = 40;
+  let y = 35;
 
   for (const address of billing) {
     if (typeof address === "string" && address.length > 0) {
@@ -157,19 +157,19 @@ function drawOrderDetails(order: { name: string; date: string }) {
   const { name, date } = order;
   const x = (38 / 100) * (width - (left + right)) * 2;
 
-  drawPdfText(doc, "Invoice Number:", x, 35, {
+  drawPdfText(doc, "Invoice Number:", x, 30, {
     weight: "bold",
     color: headingColor,
   });
 
-  drawPdfText(doc, name, x, 39, {});
+  drawPdfText(doc, name, x, 34, {});
 
-  drawPdfText(doc, "Invoice Date:", x, 45, {
+  drawPdfText(doc, "Invoice Date:", x, 40, {
     weight: "bold",
     color: headingColor,
   });
 
-  drawPdfText(doc, format(date, "dd-MM-yyyy hh:mm:ss a"), x, 49, {});
+  drawPdfText(doc, format(date, "dd-MM-yyyy hh:mm:ss a"), x, 44, {});
   doc.line(left, 65, width - right, 65);
 }
 
@@ -280,7 +280,7 @@ function drawTableRow<
     color: string;
   }[]
 >(rows: T[]): T[] {
-  const { width, left, right, doc } = config;
+  const { width: docWidth, left, right, doc } = config;
 
   rows.forEach((columns, i) => {
     let y = 75 + i * 10;
@@ -300,7 +300,7 @@ function drawTableRow<
         });
       }
 
-      doc.line(left, y, width - right, y);
+      doc.line(left, y, docWidth - right, y);
       x += width;
     });
   });
@@ -340,7 +340,9 @@ function drawTableTotal(order: OrderType) {
   if (charge?.amount > 0) {
     totals.push([
       {
-        text: charge.reason.startsWith("Standard") ? "Shipping" : charge.reason,
+        text: charge.reason.startsWith("Standard")
+          ? "SHIPPING"
+          : charge.reason.toUpperCase(),
       },
       { text: formatNumber(charge.amount), align: "right" },
     ]);
@@ -432,10 +434,7 @@ const generateRowData = (lineItems: LineItem[]) => {
     },
     {
       text: formatNumber(item.salePrice!),
-      subtext:
-        parseFloat(item.discount!) > 0
-          ? `-${formatNumber(item.discount!)}`
-          : "",
+
       width: colWitdh,
       align: "right",
     },
@@ -451,6 +450,10 @@ const generateRowData = (lineItems: LineItem[]) => {
     },
     {
       text: formatNumber(item.total!),
+      subtext:
+        parseFloat(item.discount!) > 0
+          ? `-${formatNumber(item.discount!)}`
+          : "",
       width: colWitdh,
       align: "right",
     },

@@ -32,6 +32,7 @@ import Link from "next/link";
 const OrderCard = ({ order }: { order: OrderType }) => {
   const className = getOrderBadgeClassNames(order.paymentStatus!);
   const shipmentClass = getShipmentStatusBadgeClassNames(order.shipmentStatus!);
+
   return (
     <Card
       className={`hover:border-foreground transition duration-500 overflow-hidden w-full`}

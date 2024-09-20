@@ -18,26 +18,16 @@ const CartItem = ({
   index,
   handlePlus,
   handleMinus,
+  calculateCart,
 }: {
   field: OrderFormValues["lineItems"][0];
   index: number;
   handlePlus: () => void;
   handleMinus: () => void;
+  calculateCart: () => void;
 }) => {
-  const { setValue, register, getValues } = useFormContext<OrderFormValues>();
+  const { setValue, register } = useFormContext<OrderFormValues>();
 
-  const onDiscountChange = (index: number) => {
-    const { discountLine, price, salePrice, currentQuantity } = getValues(
-      `lineItems.${index}`
-    );
-    const { type, amount } = discountLine;
-    let discount: number | string = amount;
-    if (type === "percentage") {
-      const total = parseFloat(salePrice!) * currentQuantity!;
-      discount = total * (parseFloat(amount) / 100);
-    }
-    setValue(`lineItems.${index}.discount`, `${discount}`);
-  };
   return (
     <div className="py-2 group first:pt-0 last:pb-0 group relative">
       <div className="flex">
@@ -83,65 +73,70 @@ const CartItem = ({
           </div>
         </div>
 
-        <div className="text-right w-20 ml-auto relative">
+        <div className="text-right w-24 ml-auto relative space-y-2">
           <p
-            className={`line-through text-sm text-muted-foreground ${
-              field.salePrice! < field.price! ? "opacity-100" : "opacity-0"
+            className={`line-through text-muted-foreground leading-none ${
+              parseFloat(field.total!) < parseFloat(field.subtotal!)
+                ? "opacity-100"
+                : "opacity-0"
             }`}
           >
-            {formatNumber(field.total!)}
+            {formatNumber(field.subtotal!)}
           </p>
 
-          <p className="font-medium">{formatNumber(field.total!)}</p>
-
-          {/* discount popover */}
-          <Popup
-            variant="popover"
-            content={
-              <div className="p-2 space-y-2 md:w-56">
-                <Label>Discount Type</Label>
-                <RadioGroup
-                  defaultValue="fixed"
-                  {...(register(`lineItems.${index}.discountLine.type`),
-                  {
-                    onValueChange: (e) =>
-                      setValue(`lineItems.${index}.discountLine.type`, e),
-                  })}
-                >
-                  <Label className="relative flex-1 pl-6">
-                    <RadioGroupItem value="fixed" className="absolute left-0" />
-                    Fixed
-                  </Label>
-
-                  <Label className="relative flex-1 pl-6">
-                    <RadioGroupItem
-                      value="percentage"
-                      className="absolute left-0"
-                    />
-                    Percentage
-                  </Label>
-                </RadioGroup>
-
-                <div className="space-y-1.5">
-                  <Label>Amount</Label>
-                  <Input
-                    {...register(`lineItems.${index}.discountLine.amount`, {
-                      onChange: () => onDiscountChange(index),
-                    })}
-                  />
-                </div>
-              </div>
-            }
-          >
-            <Button
-              size="icon"
-              className="opacity-0 group-hover:opacity-100 absolute bottom-0 p-2 right-0 h-auto w-auto"
-              variant="outline"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-            </Button>
-          </Popup>
+          <p className="font-medium leading-none">
+            {formatNumber(field.total!)}
+          </p>
         </div>
+        {/* discount popover */}
+        <Popup
+          variant="popover"
+          content={
+            <div className="p-2 space-y-2 md:w-56">
+              <Label>Discount Type</Label>
+              <RadioGroup
+                defaultValue="fixed"
+                {...(register(`lineItems.${index}.discountLine.type`),
+                {
+                  onValueChange: (e) => {
+                    setValue(`lineItems.${index}.discountLine.type`, e);
+                    calculateCart();
+                  },
+                })}
+              >
+                <Label className="relative flex-1 pl-6">
+                  <RadioGroupItem value="fixed" className="absolute left-0" />
+                  Fixed
+                </Label>
+
+                <Label className="relative flex-1 pl-6">
+                  <RadioGroupItem
+                    value="percentage"
+                    className="absolute left-0"
+                  />
+                  Percentage
+                </Label>
+              </RadioGroup>
+
+              <div className="space-y-1.5">
+                <Label>Amount</Label>
+                <Input
+                  {...register(`lineItems.${index}.discountLine.amount`, {
+                    onChange: calculateCart,
+                  })}
+                />
+              </div>
+            </div>
+          }
+        >
+          <Button
+            size="icon"
+            className="opacity-0 transition transform group-hover:opacity-100 px-2 -right-0.5 absolute inset-y-0 h-auto w-auto"
+            variant="outline"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </Button>
+        </Popup>
       </div>
     </div>
   );

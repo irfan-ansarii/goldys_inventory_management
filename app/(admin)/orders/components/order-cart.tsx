@@ -89,6 +89,7 @@ const OrderCart = ({
               index={i}
               handlePlus={() => handlePlus(i)}
               handleMinus={() => handleMinus(i)}
+              calculateCart={calculateCart}
             />
           ))}
         </div>

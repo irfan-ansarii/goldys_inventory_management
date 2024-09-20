@@ -49,16 +49,16 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
 
       let remainingAddress = address.trim();
 
-      while (remainingAddress.length > 20) {
-        const splitPoint = remainingAddress.lastIndexOf(" ", 20);
+      while (remainingAddress.length > 30) {
+        const splitPoint = remainingAddress.lastIndexOf(" ", 30);
         const line =
           splitPoint === -1
-            ? remainingAddress.substring(0, 20)
+            ? remainingAddress.substring(0, 30)
             : remainingAddress.substring(0, splitPoint);
         formattedAddress.push(line);
         remainingAddress =
           splitPoint === -1
-            ? remainingAddress.substring(20)
+            ? remainingAddress.substring(30)
             : remainingAddress.substring(splitPoint + 1);
       }
 

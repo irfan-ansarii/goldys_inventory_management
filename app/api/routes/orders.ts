@@ -297,6 +297,10 @@ const app = new Hono()
       taxLines: rest.taxLines,
       paymentStatus,
       due,
+      // update billing and shipping only if the customer id has changed
+      ...(rest.customerId !== order.customerId
+        ? { billing: rest.billing, shipping: rest.shipping }
+        : {}),
       updatedBy: userId,
       createdAt: new Date(rest.createdAt!),
     });

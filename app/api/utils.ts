@@ -256,7 +256,7 @@ interface FontProps {
   color: string;
   style: string;
 }
-const bodyColor = "#595959";
+const bodyColor = "#000000";
 /**
  * set font, font-weight, font-style and font-size
  */
@@ -282,7 +282,7 @@ export function drawPdfText(
     align = "left",
     style = "normal",
     weight = "normal",
-    size = 7,
+    size = 8,
     color = bodyColor,
     baseline = "bottom",
     ...rest
