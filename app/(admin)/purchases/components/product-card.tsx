@@ -58,6 +58,10 @@ const ProductCard = ({
         tax: "",
         total: "",
         taxLines: [],
+        discountLine: {
+          type: "fixed",
+          amount: "",
+        },
       });
     }
     // play sound

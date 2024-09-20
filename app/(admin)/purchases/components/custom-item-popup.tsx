@@ -56,6 +56,10 @@ const CustomItemPopup = ({ calculateCart }: { calculateCart: () => void }) => {
       purchasePrice: values.price,
       quantity: 1,
       taxRate: values.taxRate,
+      discountLine: {
+        type: "fixed",
+        amount: "",
+      },
     });
     formContext.setValue("lineItems", cartLineItems);
     calculateCart?.();

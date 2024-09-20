@@ -29,6 +29,7 @@ import {
   purchaseCreateSchema,
   purchaseLineItemCreateSchema,
 } from "@/drizzle/schemas/purchase";
+import ProductsCard from "./products-card";
 
 const lineItemSchema = purchaseLineItemCreateSchema
   .omit({
@@ -40,6 +41,10 @@ const lineItemSchema = purchaseLineItemCreateSchema
   })
   .extend({
     lineItemId: z.number().optional(),
+    discountLine: z.object({
+      type: z.string(),
+      amount: z.string(),
+    }),
   });
 
 const schema = purchaseCreateSchema
@@ -77,14 +82,14 @@ type LineProps = {
   quantity: number;
   currentQuantity: number;
   taxRate: any;
+  discountLine: {
+    type: string;
+    amount: string;
+  };
 };
 type WatchProps = [string, string, string, string, string, string, string];
 
 const PurchaseOrderForm = ({ defaultValues }: any) => {
-  const [search, setSearch] = useState("");
-
-  const { data, isLoading, isError } = useGetVariants({ q: search });
-
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues
@@ -133,23 +138,34 @@ const PurchaseOrderForm = ({ defaultValues }: any) => {
     // update the line items and return the calculated cart total
     const totals = cartLineItems.reduce(
       (acc, curr, i) => {
-        const { purchasePrice, currentQuantity, taxRate } = curr as LineProps;
+        const { purchasePrice, currentQuantity, discountLine, taxRate } =
+          curr as LineProps;
 
-        const lineSubtotal = parseFloat(purchasePrice!) * currentQuantity!;
+        const { type, amount } = discountLine;
+
+        const priceNum = parseFloat(purchasePrice);
+        const amountNum = parseFloat(amount! || "0");
+
+        const lineSubtotal = priceNum * currentQuantity!;
+        const lineDiscount =
+          type === "percentage" ? lineSubtotal * (amountNum / 100) : amountNum;
+        const lineTotal = lineSubtotal - lineDiscount;
 
         const isTaxIncluded = tType === "included";
+
         const lineTax = isTaxIncluded
-          ? lineSubtotal - lineSubtotal / (1 + taxRate! / 100)
-          : lineSubtotal * (taxRate! / 100);
+          ? lineTotal - lineTotal / (1 + taxRate! / 100)
+          : lineTotal * (taxRate! / 100);
 
         setValue(`lineItems.${i}.subtotal`, lineSubtotal.toString());
-
+        setValue(`lineItems.${i}.discount`, lineDiscount.toString());
         setValue(`lineItems.${i}.tax`, lineTax.toString());
-        setValue(`lineItems.${i}.total`, lineSubtotal.toString());
+        setValue(`lineItems.${i}.total`, lineTotal.toString());
 
         acc.subtotal += lineSubtotal;
+        acc.discount += lineDiscount;
         acc.tax += lineTax;
-        acc.total = acc.subtotal + (!isTaxIncluded ? acc.tax : 0);
+        acc.total += lineTotal + (!isTaxIncluded ? acc.tax : 0);
 
         return acc;
       },
@@ -169,10 +185,6 @@ const PurchaseOrderForm = ({ defaultValues }: any) => {
     });
   };
 
-  const isItemInCart = (id: number): boolean => {
-    return cartLineItems.findIndex((i) => i.variantId === id) !== -1;
-  };
-
   useEffect(() => {
     calculateCart();
   }, [watchValues]);
@@ -181,42 +193,7 @@ const PurchaseOrderForm = ({ defaultValues }: any) => {
     <Form {...form}>
       <div className="grid grid-cols-5 gap-6 h-full">
         <div className="col-span-5 lg:col-span-3 space-y-4 flex flex-col">
-          {/* search bar */}
-          <div className="sticky top-[4.5rem] lg:top-6 z-10">
-            <div className="relative">
-              <span className="absolute left-0 inset-y-0 px-3 pointer-events-none inline-flex items-center justify-center">
-                <Search className="w-4 h-4" />
-              </span>
-              <Input
-                placeholder="Search..."
-                className="pl-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              {/* custom item popup */}
-              <CustomItemPopup calculateCart={calculateCart} />
-            </div>
-          </div>
-
-          {/* products */}
-          <div className="flex-1 space-y-2">
-            {isLoading ? (
-              <SkeletonLoading />
-            ) : isError ? (
-              <ErrorFallback />
-            ) : (
-              data?.data?.map((variant, i) => (
-                <ProductCard
-                  key={i}
-                  variant={variant}
-                  isActive={isItemInCart(variant.id)}
-                  calculateCart={calculateCart}
-                />
-              ))
-            )}
-          </div>
-          {/* pagination */}
-          {data && <Pagination meta={data.meta} />}
+          <ProductsCard calculateCart={calculateCart} />
         </div>
 
         <div className="col-span-2 hidden lg:block">
