@@ -19,6 +19,7 @@ import {
   getVariantsProduct,
 } from "@/drizzle/services/products";
 import { limiter } from "@/lib/utils";
+import { sanitizeOutput } from "../utils";
 
 const storeCreateSchema = storeSchema.omit({
   id: true,
@@ -69,8 +70,8 @@ const app = new Hono()
 
       page = meta.page < meta.pages ? page + 1 : null;
     } while (page !== null);
-
-    return c.json({ success: true, data: store }, 201);
+    const sanitized = sanitizeOutput(store, ["token"]);
+    return c.json({ success: true, data: sanitized }, 201);
   })
 
   /********************************************************************* */
@@ -79,7 +80,8 @@ const app = new Hono()
   .get("/", async (c) => {
     const { data, meta } = await getStores();
 
-    return c.json({ success: true, data, meta }, 200);
+    const sanitized = sanitizeOutput(data, ["token"]);
+    return c.json({ success: true, data: sanitized, meta }, 200);
   })
 
   /********************************************************************* */
@@ -107,11 +109,13 @@ const app = new Hono()
 
     const token = await sign(payload, "secret");
 
+    const sanitized = sanitizeOutput(response, ["token"]);
+
     return c.json(
       {
         success: true,
         data: {
-          ...response,
+          ...sanitized,
           token,
         },
       },
@@ -130,7 +134,8 @@ const app = new Hono()
 
     const result = await getStore(id);
 
-    return c.json({ success: true, data: result }, 200);
+    const sanitized = sanitizeOutput(result, ["token"]);
+    return c.json({ success: true, data: sanitized }, 200);
   })
 
   /********************************************************************* */
@@ -155,7 +160,9 @@ const app = new Hono()
 
     const result = await updateStore(id, { ...data, token: tempToken });
 
-    return c.json({ success: true, data: result }, 200);
+    const sanitized = sanitizeOutput(result, ["token"]);
+
+    return c.json({ success: true, data: sanitized }, 200);
   })
 
   /********************************************************************* */
@@ -169,8 +176,8 @@ const app = new Hono()
       throw new HTTPException(403, { message: "Forbidden" });
 
     const result = await deleteStore(id);
-
-    return c.json({ success: true, data: result }, 200);
+    const sanitized = sanitizeOutput(result, ["token"]);
+    return c.json({ success: true, data: sanitized }, 200);
   });
 
 export default app;

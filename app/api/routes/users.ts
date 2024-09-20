@@ -12,6 +12,7 @@ import {
   updateUser,
 } from "@/drizzle/services/users";
 import { HTTPException } from "hono/http-exception";
+import { sanitizeOutput } from "../utils";
 
 const userSchema = userCreateSchema
   .pick({
@@ -63,9 +64,10 @@ const app = new Hono()
       storeId,
     });
 
+    const sanitized = sanitizeOutput(result, ["password", "otp"]);
     return c.json({
       success: true,
-      data: result,
+      data: sanitized,
     });
   })
   /********************************************************************* */
@@ -73,28 +75,33 @@ const app = new Hono()
   /********************************************************************* */
   .get("/", async (c) => {
     const { roles } = c.req.queries();
-    const { q } = c.req.query();
+    const query = c.req.query();
 
-    const results = await getUsers({
+    const { data, meta } = await getUsers({
       roles,
-      q,
+      ...query,
     });
 
+    const sanitized = sanitizeOutput(data, ["password", "otp"]);
     return c.json({
       success: true,
-      ...results,
+      sanitized,
+      meta,
     });
   })
   /********************************************************************* */
   /**                               GET ME                               */
   /********************************************************************* */
   .get("/me", async (c) => {
-    const { id, storeId } = c.get("jwtPayload");
+    const { id } = c.get("jwtPayload");
 
-    const session = await getSession(id);
+    const { store, ...rest } = await getSession(id);
+
+    const sanitizedUser = sanitizeOutput(rest, ["password", "otp"]);
+    const sanitizedStore = sanitizeOutput(store!, ["domain", "token"]);
 
     return c.json({
-      data: session,
+      data: { ...sanitizedUser, ...sanitizedStore },
       success: true,
     });
   })
@@ -108,9 +115,11 @@ const app = new Hono()
     const user = await getUser(id);
     if (!user) throw new HTTPException(404, { message: "Not Found" });
 
+    const sanitized = sanitizeOutput(user, ["password", "otp"]);
+
     return c.json({
       success: true,
-      data: user,
+      data: sanitized,
     });
   })
   /********************************************************************* */
@@ -135,9 +144,11 @@ const app = new Hono()
       address: address?.address ? address : undefined,
     });
 
+    const sanitized = sanitizeOutput(result, ["password", "otp"]);
+
     return c.json({
       success: true,
-      data: result,
+      data: sanitized,
     });
   })
   /********************************************************************* */
@@ -156,9 +167,11 @@ const app = new Hono()
 
     const result = await deleteUser(id);
 
+    const sanitized = sanitizeOutput(result, ["password", "otp"]);
+
     return c.json({
       success: true,
-      data: result,
+      data: sanitized,
     });
   });
 export default app;
