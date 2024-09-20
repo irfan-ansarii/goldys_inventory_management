@@ -76,6 +76,10 @@ const ProductsCard = ({ calculateCart }: { calculateCart: () => void }) => {
         tax: "",
         total: "",
         taxLines: [],
+        discountLine: {
+          type: "fixed",
+          amount: "",
+        },
       });
     }
     form.setValue("lineItems", cartLineItems);

@@ -29,13 +29,19 @@ export const handleShiprocketEvent = async ({ storeId, payload }: Props) => {
 
   // if there is shipment with awb then update and return
   if (shipment) {
+    let actions = ["edit", "cancel", "complete", "rto"];
+    if (mappedStatus === "delivered") {
+      actions = ["return"];
+    } else if (mappedStatus === "rto initiated") {
+      actions = ["edit", "complete"];
+    }
     return await Promise.all([
       updateShipment(shipment.id, { status: mappedStatus }),
-      updateOrder(shipment.orderId, { status: mappedStatus }),
+      updateOrder(shipment.orderId, { status: mappedStatus, actions }),
     ]);
   }
 
-  // incase the shipment is not created then create shipment and update its tracking
+  // incase the shipment is not already created then create shipment and update its tracking
   const order = await getOrder(undefined, { name: order_id, storeId: storeId });
   const orderLineItems = await getLineItems(order.id);
   const lineItems = orderLineItems.filter(
