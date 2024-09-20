@@ -89,7 +89,7 @@ const app = new Hono()
   /**                               GET ME                               */
   /********************************************************************* */
   .get("/me", async (c) => {
-    const { id } = c.get("jwtPayload");
+    const { id, storeId } = c.get("jwtPayload");
 
     const session = await getSession(id);
 

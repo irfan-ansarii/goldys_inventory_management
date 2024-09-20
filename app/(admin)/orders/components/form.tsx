@@ -29,6 +29,10 @@ const lineItemSchema = lineItemCreateSchema
   })
   .extend({
     lineItemId: z.number().optional(),
+    discountLine: z.object({
+      type: z.string(),
+      amount: z.string(),
+    }),
   });
 
 const schema = orderCreateSchema
@@ -108,7 +112,7 @@ const OrderForm = ({ defaultValues }: any) => {
   });
 
   const cartLineItems = watch("lineItems");
-
+  console.log(cartLineItems);
   const itemsCount = cartLineItems?.reduce(
     (acc, curr) => (acc += curr.currentQuantity!),
     0

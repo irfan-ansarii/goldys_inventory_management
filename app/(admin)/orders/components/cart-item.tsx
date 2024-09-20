@@ -24,8 +24,20 @@ const CartItem = ({
   handlePlus: () => void;
   handleMinus: () => void;
 }) => {
-  const { setValue, register, control, getValues } =
-    useFormContext<OrderFormValues>();
+  const { setValue, register, getValues } = useFormContext<OrderFormValues>();
+
+  const onDiscountChange = (index: number) => {
+    const { discountLine, price, salePrice, currentQuantity } = getValues(
+      `lineItems.${index}`
+    );
+    const { type, amount } = discountLine;
+    let discount: number | string = amount;
+    if (type === "percentage") {
+      const total = parseFloat(salePrice!) * currentQuantity!;
+      discount = total * (parseFloat(amount) / 100);
+    }
+    setValue(`lineItems.${index}.discount`, `${discount}`);
+  };
   return (
     <div className="py-2 group first:pt-0 last:pb-0 group relative">
       <div className="flex">
@@ -90,9 +102,10 @@ const CartItem = ({
                 <Label>Discount Type</Label>
                 <RadioGroup
                   defaultValue="fixed"
-                  {...(register("discountLines.type"),
+                  {...(register(`lineItems.${index}.discountLine.type`),
                   {
-                    onValueChange: (e) => setValue("discountLines.type", e),
+                    onValueChange: (e) =>
+                      setValue(`lineItems.${index}.discountLine.type`, e),
                   })}
                 >
                   <Label className="relative flex-1 pl-6">
@@ -111,7 +124,11 @@ const CartItem = ({
 
                 <div className="space-y-1.5">
                   <Label>Amount</Label>
-                  <Input {...register("discountLines.amount")} />
+                  <Input
+                    {...register(`lineItems.${index}.discountLine.amount`, {
+                      onChange: () => onDiscountChange(index),
+                    })}
+                  />
                 </div>
               </div>
             }
