@@ -36,6 +36,12 @@ export const validator = <
   });
 };
 
+console.log(
+  Intl.DateTimeFormat().resolvedOptions().timeZone,
+  startOfDay(new Date()),
+  endOfDay(new Date())
+);
+
 export const INTERVAL_MAP = {
   today: {
     start: startOfDay(new Date()),
