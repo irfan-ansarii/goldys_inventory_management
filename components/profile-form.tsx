@@ -38,7 +38,13 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 const themes = ["light", "dark", "system"];
 
-const ProfileForm = ({ defaultValues }: { defaultValues: SessionType }) => {
+const ProfileForm = ({
+  defaultValues,
+  compact,
+}: {
+  defaultValues: SessionType;
+  compact?: boolean;
+}) => {
   const { name, phone, email, role, store } = defaultValues;
   const [themeOpen, setThemeOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -81,6 +87,21 @@ const ProfileForm = ({ defaultValues }: { defaultValues: SessionType }) => {
     logout();
     window.location.href = "/auth/signin";
   };
+
+  if (compact) {
+    return (
+      <Tooltip content="Logout">
+        <Button
+          className="flex-none w-9 h-9 p-0"
+          variant="danger"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-4 h-4" />
+        </Button>
+      </Tooltip>
+    );
+  }
+
   return (
     <div className="flex overflow-hidden pr-1 gap-1 h-12 bg-accent justify-between items-center rounded-md">
       <Popup

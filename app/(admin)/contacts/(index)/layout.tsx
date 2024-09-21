@@ -37,7 +37,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="space-y-1">
           <CardTitle>Contacts</CardTitle>
           <CardDescription className="leading-non">
-            View and manage customers and suppliers
+            View and manage your contacts
           </CardDescription>
         </div>
         <div className="sm:ml-auto mt-3 sm:mt-0 flex flex-col sm:flex-row gap-2">
@@ -56,7 +56,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
               },
             }}
           >
-            <Button className="min-w-32">
+            <Button className="min-w-48">
               <PlusCircle className="w-4 h-4 mr-2" /> Add Contact
             </Button>
           </UserPopup>

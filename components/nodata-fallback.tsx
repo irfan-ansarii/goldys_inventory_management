@@ -15,7 +15,7 @@ const NoDataFallback = ({ className }: { className?: string }) => {
           <FileSearch className="w-5 h-5" />
         </span>
         <p className="font-semibold">No Data Available</p>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-sm text-center">
           No data is available. Please try removing or adjusting the filter.
         </p>
       </div>

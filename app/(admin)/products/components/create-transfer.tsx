@@ -305,7 +305,7 @@ const CreateTransfer = () => {
         </Form>
       }
     >
-      <Button className="min-w-32">
+      <Button className="min-w-48">
         <PlusCircle className="w-4 h-4 mr-2" /> Transfer Product
       </Button>
     </Popup>

@@ -81,7 +81,7 @@ const app = new Hono()
     const { data, meta } = await getStores();
 
     const sanitized = sanitizeOutput(data, ["token"]);
-    return c.json({ success: true, data: data, meta }, 200);
+    return c.json({ success: true, data, meta }, 200);
   })
 
   /********************************************************************* */

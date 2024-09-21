@@ -47,12 +47,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Popup
           variant="popover"
           content={
-            <div className="flex flex-col md:w-40">
+            <div className="flex flex-col md:w-44">
               {durations.map((duration) => (
                 <Link
                   key={duration.value}
                   className={buttonVariants({
-                    variant: "ghost",
+                    variant:
+                      (searchParamsObj.interval || "today") === duration.value
+                        ? "secondary"
+                        : "ghost",
                     size: "sm",
                     className: "capitalize !justify-between",
                   })}
@@ -67,7 +70,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
                   <Check
                     className={`w-4 h-4 ${
-                      searchParamsObj.interval === duration.value
+                      (searchParamsObj.interval || "today") === duration.value
                         ? "opacity-100"
                         : "opacity-0"
                     }`}
@@ -78,12 +81,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           }
         >
           <Button
-            className="ml-auto w-full md:w-44 justify-start"
+            className="ml-auto w-full md:w-48 justify-start"
             variant="outline"
           >
             <CalendarIcon className="w-4 h-4 mr-2" />
-            {durations.find((d) => d.value === searchParamsObj.interval)
-              ?.label || "Today"}
+            {
+              durations.find(
+                (d) => d.value === (searchParamsObj.interval || "today")
+              )?.label
+            }
           </Button>
         </Popup>
       </div>

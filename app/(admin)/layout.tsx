@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import { AuthProvider } from "@/components/auth-provider";
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
-  let session = null;
+  let session = {} as Record<string, any>;
 
   try {
     session = await getSession();
@@ -21,7 +21,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
         </div>
         <div className="flex flex-col relative">
           <div className="absolute h-64 bg-secondar left-0 top-0 inset-x-0 z-[-1]"></div>
-          <Header />
+          <Header session={session?.data} />
           <main className="flex flex-1 flex-col container p-4 md:p-6">
             {children}
           </main>

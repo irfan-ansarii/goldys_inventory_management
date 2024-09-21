@@ -45,7 +45,7 @@ const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
         <Link
           href="/orders/new"
-          className={buttonVariants({ className: "ml-auto min-w-32" })}
+          className={buttonVariants({ className: "ml-auto min-w-48" })}
         >
           <PlusCircle className="w-4 h-4 mr-2" /> Add Order
         </Link>

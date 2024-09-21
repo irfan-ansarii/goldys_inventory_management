@@ -44,7 +44,7 @@ const ExpenseLayout = ({ children }: { children: React.ReactNode }) => {
               notes: "",
             }}
           >
-            <Button className="min-w-32">
+            <Button className="min-w-48">
               <PlusCircle className="w-4 h-4 mr-2" /> Add Expense
             </Button>
           </UserPopup>
@@ -53,7 +53,7 @@ const ExpenseLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex flex-col md:flex-row mb-6 justify-end gap-2">
         <Popup
           content={
-            <div className="md:w-40 space-y-1 [&>*]:justify-start [&>*]:w-full">
+            <div className="md:w-44 space-y-1 [&>*]:justify-start [&>*]:w-full">
               {categories.map((category) => {
                 return (
                   <Link
@@ -90,7 +90,7 @@ const ExpenseLayout = ({ children }: { children: React.ReactNode }) => {
           variant="popover"
         >
           <Button
-            className="justify-between md:w-44 md:order-3"
+            className="justify-between md:w-48 md:order-3"
             variant="outline"
           >
             <span className="inline-flex items-center">

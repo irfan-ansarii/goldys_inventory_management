@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 
 import {
+  Check,
   ChevronDown,
-  Filter,
   ListFilter,
   Loader,
   PlusCircle,
@@ -19,10 +19,19 @@ import Popup from "@/components/custom-ui/popup";
 import Navigation from "../components/navigation";
 import BarcodePopup from "../components/barcode-popup";
 import { toast } from "sonner";
+import { useRouterStuff } from "@/hooks/use-router-stuff";
+import Link from "next/link";
+
+const types = [
+  { label: "All", value: "" },
+  { label: "Pending", value: "pending" },
+  { label: "Printed", value: "printed" },
+  { label: "Cancelled", value: "cancelled" },
+];
 
 const BarcodesLayout = ({ children }: { children: React.ReactNode }) => {
   const { mutate, isPending } = useBulkPrintBarcode();
-
+  const { queryParams, searchParamsObj } = useRouterStuff();
   const handlePrint = () => {
     const id = toast.loading("Please wait...", {
       duration: Infinity,
@@ -46,7 +55,7 @@ const BarcodesLayout = ({ children }: { children: React.ReactNode }) => {
             View and manage product barcodes
           </CardDescription>
         </div>
-        <div className="sm:ml-auto mt-3 sm:mt-0 flex flex-col sm:flex-row gap-2">
+        <div className="sm:ml-auto mt-3 sm:mt-0 [&>*]:flex-1 flex gap-2 ">
           <Button
             className="min-w-32"
             variant="outline"
@@ -64,31 +73,54 @@ const BarcodesLayout = ({ children }: { children: React.ReactNode }) => {
           </Button>
           <BarcodePopup>
             <Button className="min-w-32">
-              <PlusCircle className="w-4 h-4 mr-2" /> Add Product to Print List
+              <PlusCircle className="w-4 h-4 mr-2" /> Add to Print List
             </Button>
           </BarcodePopup>
         </div>
       </div>
       <Navigation />
       <div className="flex flex-col md:flex-row mb-6 justify-end gap-2">
-        <Button
-          className="justify-between md:w-36 md:order-2"
-          variant="outline"
+        <Popup
+          content={
+            <div className="md:w-44 space-y-1 [&>*]:justify-start [&>*]:w-full">
+              {types.map((type) => (
+                <Link
+                  href={
+                    queryParams({
+                      ...(type.value === ""
+                        ? { del: "status" }
+                        : { set: { status: type.value } }),
+                      getNewPath: true,
+                    }) as string
+                  }
+                  className={buttonVariants({
+                    variant: "ghost",
+                    size: "sm",
+                    className: `${
+                      (searchParamsObj.status || "") === type.value
+                        ? "!bg-accent [&>svg]:opacity-100"
+                        : ""
+                    }`,
+                  })}
+                >
+                  {type.label}
+                  <Check className="w-4 h-4 ml-auto opacity-0" />
+                </Link>
+              ))}
+            </div>
+          }
+          variant="popover"
         >
-          <span className="inline-flex items-center">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </span>
-          <ChevronDown className="w-4 h-4" />
-        </Button>
-        <Popup content={<div className="w-24">Content</div>} variant="popover">
           <Button
-            className="justify-between md:w-36 md:order-3"
+            className="justify-between md:w-48 md:order-3"
             variant="outline"
           >
             <span className="inline-flex items-center">
               <ListFilter className="w-4 h-4 mr-2" />
-              Sort By
+              {
+                types.find((t) => t.value === (searchParamsObj.status || ""))
+                  ?.label
+              }
             </span>
             <ChevronDown className="w-4 h-4" />
           </Button>

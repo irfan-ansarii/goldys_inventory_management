@@ -30,7 +30,7 @@ const PurchaseLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
         <Link
           href="/purchases/new"
-          className={buttonVariants({ className: "ml-auto min-w-32" })}
+          className={buttonVariants({ className: "ml-auto min-w-48" })}
         >
           <PlusCircle className="w-4 h-4 mr-2" /> Add Purchase
         </Link>

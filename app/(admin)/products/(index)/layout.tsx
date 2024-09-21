@@ -31,7 +31,7 @@ const ProductsLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="sm:ml-auto mt-3 sm:mt-0 flex flex-col sm:flex-row gap-2">
           <Link
             href="/products/new"
-            className={buttonVariants({ className: "min-w-32" })}
+            className={buttonVariants({ className: "min-w-48" })}
           >
             <PlusCircle className="w-4 h-4 mr-2" /> Add Product
           </Link>
@@ -41,7 +41,7 @@ const ProductsLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex flex-col md:flex-row mb-6 justify-end gap-2">
         <Popup
           content={
-            <div className="md:w-40 space-y-1 [&>*]:justify-start [&>*]:w-full">
+            <div className="md:w-44 space-y-1 [&>*]:justify-start [&>*]:w-full">
               <Link
                 href={
                   queryParams({
@@ -105,7 +105,7 @@ const ProductsLayout = ({ children }: { children: React.ReactNode }) => {
           variant="popover"
         >
           <Button
-            className="justify-between md:w-44 md:order-3"
+            className="justify-between md:w-48 md:order-3"
             variant="outline"
           >
             <span className="inline-flex items-center">

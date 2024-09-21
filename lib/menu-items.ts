@@ -1,5 +1,7 @@
 import {
   BarChart,
+  BarChart2,
+  BarChartBig,
   ClipboardList,
   FilePenLine,
   Inbox,
@@ -51,7 +53,7 @@ export const MENU_ITEMS = [
   {
     title: "Reports",
     slug: "/reports",
-    icon: BarChart,
+    icon: BarChartBig,
   },
 
   {

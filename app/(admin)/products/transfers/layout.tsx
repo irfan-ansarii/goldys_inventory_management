@@ -1,15 +1,25 @@
+"use client";
 import React from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
-import { ChevronDown, Filter, ListFilter } from "lucide-react";
+import { Check, ChevronDown, ListFilter } from "lucide-react";
 
 import Navigation from "../components/navigation";
 import Popup from "@/components/custom-ui/popup";
 import SearchBar from "@/components/search-bar";
 import CreateTransfer from "../components/create-transfer";
+import Link from "next/link";
+import { useRouterStuff } from "@/hooks/use-router-stuff";
+
+const types = [
+  { label: "All", value: "" },
+  { label: "Sent", value: "sent" },
+  { label: "Received", value: "received" },
+];
 
 const TransfersLayout = ({ children }: { children: React.ReactNode }) => {
+  const { queryParams, searchParamsObj } = useRouterStuff();
   return (
     <>
       <div className="flex flex-col sm:flex-row md:col-span-3 mb-6">
@@ -25,24 +35,47 @@ const TransfersLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
       <Navigation />
       <div className="flex flex-col md:flex-row mb-6 justify-end gap-2">
-        <Button
-          className="justify-between md:w-36 md:order-2"
-          variant="outline"
+        <Popup
+          content={
+            <div className="md:w-44 space-y-1 [&>*]:justify-start [&>*]:w-full">
+              {types.map((type) => (
+                <Link
+                  href={
+                    queryParams({
+                      ...(type.value === ""
+                        ? { del: "type" }
+                        : { set: { type: type.value } }),
+                      getNewPath: true,
+                    }) as string
+                  }
+                  className={buttonVariants({
+                    variant: "ghost",
+                    size: "sm",
+                    className: `${
+                      (searchParamsObj.type || "") === type.value
+                        ? "!bg-accent [&>svg]:opacity-100"
+                        : ""
+                    }`,
+                  })}
+                >
+                  {type.label}
+                  <Check className="w-4 h-4 ml-auto opacity-0" />
+                </Link>
+              ))}
+            </div>
+          }
+          variant="popover"
         >
-          <span className="inline-flex items-center">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </span>
-          <ChevronDown className="w-4 h-4" />
-        </Button>
-        <Popup content={<div className="w-24">Content</div>} variant="popover">
           <Button
-            className="justify-between md:w-36 md:order-3"
+            className="justify-between md:w-48 md:order-3"
             variant="outline"
           >
             <span className="inline-flex items-center">
               <ListFilter className="w-4 h-4 mr-2" />
-              Sort By
+              {
+                types.find((t) => t.value === (searchParamsObj.type || ""))
+                  ?.label
+              }
             </span>
             <ChevronDown className="w-4 h-4" />
           </Button>
