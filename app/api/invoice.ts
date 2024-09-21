@@ -434,7 +434,10 @@ const generateRowData = (lineItems: LineItem[]) => {
     },
     {
       text: formatNumber(item.salePrice!),
-
+      subtext:
+        parseFloat(item.price!) > parseFloat(item.salePrice!)
+          ? `-${formatNumber(item.price!)}`
+          : "",
       width: colWitdh,
       align: "right",
     },
@@ -449,7 +452,7 @@ const generateRowData = (lineItems: LineItem[]) => {
       align: "right",
     },
     {
-      text: formatNumber(item.total!),
+      text: formatNumber(item.subtotal!),
       subtext:
         parseFloat(item.discount!) > 0
           ? `-${formatNumber(item.discount!)}`

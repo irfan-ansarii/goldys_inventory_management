@@ -20,7 +20,7 @@ export const upsertOption = async (values: any) => {
     .then(findFirst);
 
   if (response) {
-    return await updateOption(key, values);
+    return await updateOption(key, values, storeId);
   }
   return await createOption(values);
 };
@@ -43,11 +43,11 @@ export const getOptions = async (storeId: number) => {
   return await db.select().from(options).where(eq(options.storeId, storeId));
 };
 // update options
-export const updateOption = async (key: string, values: any) => {
+export const updateOption = async (key: string, values: any, storeId: any) => {
   return await db
     .update(options)
     .set(values)
-    .where(eq(options.key, key))
+    .where(and(eq(options.key, key), eq(options.storeId, storeId)))
     .returning()
     .then(findFirst);
 };
