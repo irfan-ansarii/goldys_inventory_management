@@ -3,6 +3,7 @@ import bwipjs from "bwip-js";
 import jsPDF from "jspdf";
 import { truncatePdfText } from "@/app/api/utils";
 import { getBarcodeConfig } from "./barcode-config";
+import { formatNumber } from "./utils";
 
 type LabelConfig = Record<string, number>;
 type LabelItem = {
@@ -66,29 +67,24 @@ export async function drawBarcode(
 
   const barcodeWidth = (width - gap * (columns - 1)) / columns - (left + right);
 
-  doc.addImage(generatedBarcode, x, y, barcodeWidth, 8);
+  doc.addImage(generatedBarcode, x, y, barcodeWidth, 11);
 
-  y += 10;
+  y += 11;
 
   /** calculate barcode characters width */
-  let charX = x;
-  const totalWidth = Array.from(barcode).reduce((acc, curr) => {
-    const { w } = doc.getTextDimensions(curr);
-    acc += w;
-    return acc;
-  }, 0) as number;
+  let cx = x + left * 3;
+  const { w: tw, h } = doc.getTextDimensions(barcode);
 
   /** draw barcode characters */
-  const space = (barcodeWidth - totalWidth) / (barcode.length - 1);
-
-  Array.from(barcode).forEach((item) => {
-    const { w } = doc.getTextDimensions(item);
-    doc.text(item, charX, y);
-    charX += w + space;
+  const space = (barcodeWidth - (tw + left * 6)) / (barcode.length - 1);
+  doc.setFillColor("#ffffff");
+  doc.rect(cx - 2, y - h, tw + space * (barcode.length - 1) + 4, h + 1, "F");
+  doc.text(barcode, cx, y, {
+    charSpace: space,
   });
 
   /** draw product title */
-  y += 4;
+  y += 3;
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
 
@@ -113,7 +109,7 @@ export async function drawBarcode(
   doc.setFont("helvetica", "bold");
   const priceWidth = doc.getTextWidth(price);
   x += barcodeWidth - priceWidth;
-  doc.text(price, x, height - bottom);
+  doc.text(formatNumber(price), x, height - bottom);
 
   /** draw price symbol !!INR */
   doc.setFont("helvetica", "normal");

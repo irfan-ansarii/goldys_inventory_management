@@ -19,6 +19,7 @@ import { UserType, useUsersData } from "@/query/users";
 import Avatar from "@/components/custom-ui/avatar";
 import PopupLoading from "@/components/popup-loading";
 import UserPopup from "../../contacts/components/user-popup";
+import { splitText } from "@/lib/utils";
 
 interface Props {
   onPrev: () => void;
@@ -43,33 +44,9 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
 
     if (add?.address) {
       const { address, city, state, pincode, gstin } = add as AddressType;
-
-      const formattedStatePincode = `${state} - ${pincode}`;
-      let formattedAddress = [];
-
-      let remainingAddress = address.trim();
-
-      while (remainingAddress.length > 30) {
-        const splitPoint = remainingAddress.lastIndexOf(" ", 30);
-        const line =
-          splitPoint === -1
-            ? remainingAddress.substring(0, 30)
-            : remainingAddress.substring(0, splitPoint);
-        formattedAddress.push(line);
-        remainingAddress =
-          splitPoint === -1
-            ? remainingAddress.substring(30)
-            : remainingAddress.substring(splitPoint + 1);
-      }
-
-      billing = [
-        name,
-        ...formattedAddress,
-        city,
-        formattedStatePincode,
-        phone,
-        email,
-      ];
+      const string = `${name} ${address} ${city} ${state} - ${pincode}`;
+      const splitted = splitText(string);
+      billing = [...splitted, `Phone: ${phone}`, `Email: ${email}`];
 
       if (gstin) billing.push(`GSTIN: ${gstin}`);
     }

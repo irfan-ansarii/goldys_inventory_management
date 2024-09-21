@@ -14,6 +14,7 @@ import {
   createAdminRestApiClient,
   AdminRestApiClient,
 } from "@shopify/admin-api-client";
+import { splitText } from "@/lib/utils";
 
 interface ShippingLine {
   reason: string;
@@ -307,35 +308,12 @@ const formatAddress = (args: any) => {
     country,
   } = args;
 
-  const address = `${address1} ${address2 ? address2 : ""}`;
+  const address = `${first_name} ${last_name} ${address1} ${
+    address2 ? address2 : ""
+  } ${city} ${province} - ${zip} ${country}`;
 
-  let formattedAddress = [];
-
-  let remainingAddress = address.trim();
-
-  while (remainingAddress.length > 30) {
-    const splitPoint = remainingAddress.lastIndexOf(" ", 30);
-    const line =
-      splitPoint === -1
-        ? remainingAddress.substring(0, 30)
-        : remainingAddress.substring(0, splitPoint);
-    formattedAddress.push(line);
-    remainingAddress =
-      splitPoint === -1
-        ? remainingAddress.substring(30)
-        : remainingAddress.substring(splitPoint + 1);
-  }
-
-  const formattedStatePincode = `${province} - ${zip}`;
-  return [
-    `${first_name} ${last_name}`,
-    ...formattedAddress,
-    city,
-    formattedStatePincode,
-    country,
-    phone,
-    email,
-  ];
+  const splitted = splitText(address);
+  return [...splitted, `Phone: ${phone}`, `Email: ${email}`];
 };
 
 const getChannelTransactions = async (
