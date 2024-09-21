@@ -40,6 +40,7 @@ const TransfersLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="md:w-44 space-y-1 [&>*]:justify-start [&>*]:w-full">
               {types.map((type) => (
                 <Link
+                  key={type.value}
                   href={
                     queryParams({
                       ...(type.value === ""

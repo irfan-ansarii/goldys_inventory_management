@@ -82,7 +82,7 @@ const app = new Hono()
       roles,
     });
 
-    const sanitized = sanitizeOutput(data, ["password", "otp"]);
+    const sanitized = data.map((d) => sanitizeOutput(d, ["password", "otp"]));
 
     return c.json({
       success: true,
