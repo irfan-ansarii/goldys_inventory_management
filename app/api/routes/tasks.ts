@@ -76,17 +76,7 @@ const app = new Hono()
             ids: item.users,
           });
 
-          sanitized = sanitizeOutput(users, [
-            "address",
-            "createdAt",
-            "email",
-            "otp",
-            "password",
-            "phone",
-            "role",
-            "storeId",
-            "updatedAt",
-          ]);
+          sanitized = sanitizeOutput(users, ["otp", "password"]);
         }
 
         return { ...item, users: sanitized };
@@ -119,17 +109,7 @@ const app = new Hono()
         ids: response.users,
       });
 
-      sanitized = sanitizeOutput(users, [
-        "address",
-        "createdAt",
-        "email",
-        "otp",
-        "password",
-        "phone",
-        "role",
-        "storeId",
-        "updatedAt",
-      ]);
+      sanitized = sanitizeOutput(users, ["otp", "password"]);
     }
 
     return c.json(
@@ -166,19 +146,19 @@ const app = new Hono()
         actions: ["progress", "complete", "cancel"],
       };
     }
-    if (action === "progress" && response.actions?.includes(action)) {
+    if (action === "progress") {
       payload = {
         status: "in progress",
         actions: ["complete"],
       };
     }
-    if (action === "progress" && response.actions?.includes(action)) {
+    if (action === "complete") {
       payload = {
         status: "completed",
         actions: [],
       };
     }
-    if (action === "cancel" && response.actions?.includes(action)) {
+    if (action === "cancel") {
       payload = {
         status: "cancelled",
         actions: [],
