@@ -24,8 +24,9 @@ const SaleOverview = async ({
   const { data } = await getOverview(interval);
 
   const chartData = data.map((item) => ({
-    ...item,
     name: formatDate(interval, item.name),
+    sale: parseFloat(item.sale || "0"),
+    purchase: parseFloat(item.purchase || "0"),
   }));
 
   return (

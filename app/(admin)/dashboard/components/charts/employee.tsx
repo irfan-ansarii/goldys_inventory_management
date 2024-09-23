@@ -17,6 +17,12 @@ export default function EmployeeChart({
 }: {
   chartData: Record<string, string | number | null>[];
 }) {
+  const indexOfLargest = chartData.reduce(
+    (maxIndex, item, index, array) =>
+      item.total! > array[maxIndex].total! ? index : maxIndex,
+    0
+  );
+
   return (
     <ChartContainer
       config={chartConfig}
@@ -25,14 +31,14 @@ export default function EmployeeChart({
       <PieChart>
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent hideLabel />}
+          content={<ChartTooltipContent hideLabel asNumber />}
         />
         <Pie
           data={chartData}
           dataKey="total"
           outerRadius={110}
           strokeWidth={5}
-          activeIndex={0}
+          activeIndex={indexOfLargest}
           activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
             <Sector {...props} outerRadius={outerRadius + 10} />
           )}

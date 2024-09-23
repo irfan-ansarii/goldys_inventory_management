@@ -10,6 +10,7 @@ import { Button } from "./ui/button";
 
 const StoreItem = ({ store }: { store: StoreType }) => {
   const { login, data } = useAuth();
+
   const switchStore = useSwitchStore(store.id);
 
   const isChecked = store.id === data?.storeId;

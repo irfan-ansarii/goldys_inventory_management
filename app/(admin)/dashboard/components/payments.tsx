@@ -21,6 +21,7 @@ const Payments = async ({
     sale: parseFloat(item.total),
     fill: CHART_COLORS[i % CHART_COLORS.length],
   }));
+
   const purchaseData = purchase.map((item, i) => ({
     ...item,
     purchase: parseFloat(item.total),

@@ -22,10 +22,10 @@ const BestSellers = async ({
   }
   return (
     <div className="divide-y">
-      {data.map((product) => (
+      {data.map((product, i) => (
         <div
           className="grid grid-cols-3 overflow-hidden gap-3 py-2 first:pt-0 last:pb-0"
-          key={product.id}
+          key={`${product.id}-${i}`}
         >
           <div className="flex items-center gap-3 overflow-hidden col-span-2">
             <Avatar src={product.image}></Avatar>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   ChartConfig,
@@ -12,11 +12,9 @@ import { CHART_COLORS } from "@/lib/utils";
 
 const chartConfig = {
   sale: {
-    label: "Sale",
     color: CHART_COLORS[0],
   },
   purchase: {
-    label: "Purchase",
     color: CHART_COLORS[1],
   },
 } satisfies ChartConfig;
@@ -24,7 +22,7 @@ const chartConfig = {
 export default function OverviewChart({
   chartData,
 }: {
-  chartData: { name: string; sale: string | null; purchase: string | null }[];
+  chartData: { name: string; sale: number; purchase: number }[];
 }) {
   return (
     <ChartContainer config={chartConfig}>
@@ -36,6 +34,7 @@ export default function OverviewChart({
           tickMargin={10}
           axisLine={false}
         />
+
         <ChartTooltip
           cursor={false}
           content={<ChartTooltipContent indicator="dashed" asNumber />}
