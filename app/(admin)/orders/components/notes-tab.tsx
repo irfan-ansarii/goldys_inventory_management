@@ -74,6 +74,7 @@ const NotesTab = ({ onPrev, onNext }: Props) => {
 
   const handleNext = (orderData: any) => {
     if (orderId) {
+      console.log(orderData);
       // update order
       update(orderData, {
         onSuccess: ({ data }) => {
@@ -85,6 +86,7 @@ const NotesTab = ({ onPrev, onNext }: Props) => {
           form.reset();
           router.refresh();
         },
+        onError: (e) => console.log(e),
       });
     } else {
       // create order

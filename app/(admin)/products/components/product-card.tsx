@@ -20,15 +20,13 @@ const ProductCard = ({ product }: { product: ProductType }) => {
         <span className="shrink-0">
           <Avatar src={product.image || product.title!} />
         </span>
-        <div className="grid grid-cols-3 gap-4 gap-y-2">
+        <div className="grid grid-cols-3 gap-4 gap-y-2 flex-1">
           <div
             className={`space-y-1 col-span-2 overflow-hidden ${
               isArchived ? "line-through text-muted-foreground" : ""
             }`}
           >
-            <h2 className="font-medium truncate">
-              {product.title} {product.id}
-            </h2>
+            <h2 className="font-medium truncate">{product.title}</h2>
             <p className="text-muted-foreground text-sm truncate">
               {product.description}
             </p>

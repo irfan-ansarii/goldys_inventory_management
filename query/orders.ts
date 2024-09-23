@@ -162,7 +162,7 @@ export const useCreateTransaction = (id: any) => {
       if (!jsonResponse.success) throw jsonResponse;
       return jsonResponse;
     },
-    onSuccess: () => toast.error("Transaction created"),
+    onSuccess: () => toast.success("Transaction created"),
     onError: (error) => {
       toast.error(error.message);
     },

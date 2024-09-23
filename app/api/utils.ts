@@ -284,6 +284,7 @@ export function drawPdfText(
   y: number,
   options: TextOptions
 ) {
+  if (!text) return;
   const {
     width = 128,
     align = "left",

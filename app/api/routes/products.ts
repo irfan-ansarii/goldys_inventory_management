@@ -65,7 +65,7 @@ const productUpdateSchema = productCreateSchema
       .array(),
   });
 
-const generateBarcode = (id: number) => {
+export const generateBarcode = (id: number) => {
   return `GN${`${id}`.padStart(6, "0")}`;
 };
 

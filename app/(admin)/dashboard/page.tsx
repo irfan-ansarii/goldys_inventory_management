@@ -17,7 +17,6 @@ import ExpenseCard from "./components/expense-card";
 import ProductCard from "./components/product-card";
 import IconCard from "./components/icon-card";
 import OrdersCard from "./components/orders-card";
-import EmptyState from "./components/empty-state";
 import Shipments from "./components/shipments";
 
 export const metadata: Metadata = {

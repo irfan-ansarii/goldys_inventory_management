@@ -19,6 +19,10 @@ const EditOrderPage = async ({
 
   data.lineItems = data.lineItems.map((item) => ({
     ...item,
+    discountLine: {
+      type: "fixed",
+      amount: item.discount,
+    },
     lineItemId: item.id,
   }));
 

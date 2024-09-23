@@ -269,7 +269,7 @@ const app = new Hono()
     if (!order || order.storeId !== storeId) {
       throw new HTTPException(404, { message: "Order not found" });
     }
-    if (order.cancelledAt || order.shipmentStatus !== "processing")
+    if (order.cancelledAt)
       throw new HTTPException(400, { message: "Order could not be edited" });
 
     const { lineItems, ...rest } = c.req.valid("json");
@@ -439,10 +439,12 @@ const app = new Hono()
 
     // @ts-ignore regenerate invoice to make sure it is updated
     const blob = await createOrderInvoice({ ...order, lineItems });
+
     const blobResponse = await put(order.name, blob, { access: "public" });
 
-    if (order.invoice) await del(order.invoice);
     await updateOrder(order.id, { invoice: blobResponse.url });
+
+    if (order.invoice) waitUntil(del(order.invoice));
 
     // TODO implement the ability to send invoice throught email and whatsapp
     if (action === "send") {

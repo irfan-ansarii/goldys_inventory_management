@@ -53,11 +53,14 @@ const schema = orderCreateSchema
       reason: z.any(),
       amount: z.any(),
     }),
-    discountLines: z.object({
-      type: z.string(),
-      reason: z.string(),
-      amount: z.string(),
-    }),
+    discountLines: z
+      .object({
+        type: z.string(),
+        reason: z.string(),
+        amount: z.string(),
+      })
+      .optional()
+      .nullable(),
     taxKind: z.object({
       type: z.string(),
       saleType: z.string(),
@@ -137,7 +140,7 @@ const OrderForm = ({ defaultValues }: any) => {
         const { salePrice, currentQuantity, discountLine, taxRate } =
           curr as LineProps;
 
-        const { type, amount } = discountLine;
+        const { type = "fixed", amount = "0" } = discountLine || {};
 
         const priceNum = parseFloat(salePrice);
         const amountNum = parseFloat(amount! || "0");

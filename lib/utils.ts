@@ -135,22 +135,25 @@ export const limiter = new Bottleneck({
 });
 
 export const splitText = (string: string) => {
-  let splitted = [];
-
+  const maxLineLength = 30;
+  const result = [];
   let remainingString = string.trim();
 
-  while (remainingString.length > 30) {
-    const splitPoint = remainingString.lastIndexOf(" ", 30);
-    const line =
-      splitPoint === -1
-        ? remainingString.substring(0, 30)
-        : remainingString.substring(0, splitPoint);
-    splitted.push(line);
+  while (remainingString.length > maxLineLength) {
+    let splitPoint = remainingString.lastIndexOf(" ", maxLineLength);
 
-    remainingString =
-      splitPoint === -1
-        ? remainingString.substring(30)
-        : remainingString.substring(splitPoint + 1);
+    if (splitPoint === -1) {
+      splitPoint = maxLineLength;
+    }
+
+    result.push(remainingString.slice(0, splitPoint));
+
+    remainingString = remainingString.slice(splitPoint).trim();
   }
-  return splitted;
+
+  if (remainingString) {
+    result.push(remainingString);
+  }
+
+  return result;
 };

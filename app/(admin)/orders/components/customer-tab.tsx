@@ -43,9 +43,11 @@ const CustomerTab = ({ onPrev, onNext }: Props) => {
     let billing = [name, phone, email];
 
     if (add?.address) {
+      console.log(add);
       const { address, city, state, pincode, gstin } = add as AddressType;
       const string = `${address} ${city} ${state} - ${pincode}`;
       const splitted = splitText(string);
+      console.log(string, splitted);
       billing = [name, ...splitted, `Phone: ${phone}`, `Email: ${email}`];
 
       if (gstin) billing.push(`GSTIN: ${gstin}`);
