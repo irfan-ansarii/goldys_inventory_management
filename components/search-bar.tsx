@@ -1,11 +1,27 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components//ui/input";
 import { Search, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
 import { useRouterStuff } from "@/hooks/use-router-stuff";
+
+// Debounce helper function to prevent frequent updates
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler); // Cleanup on unmount or value change
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 const SearchBar = ({
   containerClassName,
@@ -15,16 +31,23 @@ const SearchBar = ({
   inputClassName?: string;
 }) => {
   const { queryParams, searchParamsObj } = useRouterStuff();
-
   const [value, setValue] = useState(searchParamsObj.q || "");
 
+  // Debounce the value to prevent excessive query updates
+  const debouncedValue = useDebounce(value, 300); // Adjust the delay as needed
+
   useEffect(() => {
-    if (value) {
-      queryParams({ set: { q: value } });
-    } else if (!value || searchParamsObj.q === "") {
+    if (debouncedValue) {
+      queryParams({ set: { q: debouncedValue } });
+    } else if (searchParamsObj.q !== "") {
       queryParams({ del: "q" });
     }
-  }, [value]);
+  }, [debouncedValue]); // Only runs when the debounced value changes
+
+  // Memoizing the clear input function to prevent re-renders
+  const clearInput = useCallback(() => {
+    setValue("");
+  }, []);
 
   return (
     <div className={cn("relative", containerClassName)}>
@@ -39,7 +62,7 @@ const SearchBar = ({
       />
       <Badge
         variant="secondary"
-        onClick={() => setValue("")}
+        onClick={clearInput}
         className={`absolute justify-center right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 p-0 ${
           value ? "opacity-100" : "opacity-0"
         }`}

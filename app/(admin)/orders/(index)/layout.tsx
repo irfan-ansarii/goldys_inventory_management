@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 
 import Popup from "@/components/custom-ui/popup";
@@ -36,6 +36,13 @@ const shipmentStatus = [
 
 const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
   const { queryParams, searchParamsObj } = useRouterStuff();
+
+  const status = useMemo(() => {
+    return shipmentStatus.find(
+      (i) => i.value === (searchParamsObj.shipmentStatus || "")
+    )?.label;
+  }, [searchParamsObj.shipmentStatus]);
+
   return (
     <>
       <div className="mb-6 flex">
@@ -169,11 +176,7 @@ const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
             <span className="inline-flex items-center">
               <ListFilter className="w-4 h-4 mr-2" />
 
-              {
-                shipmentStatus.find(
-                  (i) => i.value === (searchParamsObj.shipmentStatus || "")
-                )?.label
-              }
+              {status}
             </span>
             <ChevronDown className="w-4 h-4" />
           </Button>
