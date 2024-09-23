@@ -44,7 +44,7 @@ export async function getUser(id: any, params?: Record<string, any>) {
 
 export async function getUsers(params: Record<string, any>) {
   const { storeId, ids, roles, q, page = 1, limit = PAGE_LIMIT } = params;
-  console.log(ids, roles);
+
   const filters = and(
     storeId ? eq(users.storeId, storeId) : undefined,
     roles ? inArray(users.role, roles) : undefined,

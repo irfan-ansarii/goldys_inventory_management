@@ -54,11 +54,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/", async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const query = c.req.queries();
+    const query = c.req.query();
 
-    const results = await getBarcodes({ storeId, ...query });
-
-    return c.json({ success: true, ...results }, 200);
+    const { data, meta } = await getBarcodes({ storeId, ...query });
+    console.log(meta);
+    return c.json({ success: true, data, meta }, 200);
   })
 
   /********************************************************************* */

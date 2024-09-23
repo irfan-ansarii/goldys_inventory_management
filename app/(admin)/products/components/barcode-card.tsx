@@ -24,6 +24,7 @@ const BarcodeCard = ({ data }: { data: BarcodeType }) => {
             <h2 className="font-medium capitalize"> {data.title}</h2>
             <Badge variant="outline">{data.variantTitle}</Badge>
 
+            {/* 
             <div className="flex gap-2 items-center text-muted-foreground text-xs !mt-2">
               <Tooltip content="Created at">
                 <span className="inline-flex gap-1 items-center">
@@ -55,6 +56,7 @@ const BarcodeCard = ({ data }: { data: BarcodeType }) => {
                 </>
               )}
             </div>
+             */}
           </div>
         </div>
         <div className="ml-auto flex gap-2 items-center">

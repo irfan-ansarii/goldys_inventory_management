@@ -13,7 +13,7 @@ const BarcodesPage = async ({
 }: {
   searchParams: Record<string, string>;
 }) => {
-  const { data, meta } = await getBarcodes({ searchParams });
+  const { data, meta } = await getBarcodes({ ...searchParams });
 
   return (
     <>

@@ -74,8 +74,8 @@ const app = new Hono()
   /**                              GET USERS                             */
   /********************************************************************* */
   .get("/", async (c) => {
-    const { roles } = c.req.queries();
     const query = c.req.query();
+    const { roles } = c.req.queries();
 
     const { data, meta } = await getUsers({
       ...query,

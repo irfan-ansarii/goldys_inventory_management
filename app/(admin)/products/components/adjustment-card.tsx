@@ -25,6 +25,7 @@ const AdjustmentCard = ({ data }: { data: AdjustmentType }) => {
                 {data.variantTitle}
               </Badge>
             </div>
+            {/* 
             <div className="flex gap-2 items-center text-muted-foreground text-xs !mt-2">
               <Tooltip content="Created at">
                 <span className="inline-flex gap-1 items-center">
@@ -55,6 +56,7 @@ const AdjustmentCard = ({ data }: { data: AdjustmentType }) => {
                 </>
               )}
             </div>
+             */}
           </div>
         </div>
         <div className="ml-auto flex gap-2 items-center">

@@ -126,7 +126,7 @@ const app = new Hono()
   /********************************************************************* */
   .get("/", async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const query = c.req.queries();
+    const query = c.req.query();
 
     const { data, meta } = await getTransfers({ storeId, ...query });
 

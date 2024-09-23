@@ -9,7 +9,7 @@ import UserActions from "./user-actions";
 import UserPopup from "@/app/(admin)/contacts/components/user-popup";
 
 const UsersPage = async () => {
-  const { data } = await getUsers({ roles: ["admin", "users"] });
+  const { data } = await getUsers({ roles: ["admin", "user"] });
 
   return (
     <div className="space-y-6">
@@ -28,7 +28,7 @@ const UsersPage = async () => {
       </div>
       <div className="divide-y">
         {data.map((user) => (
-          <div key={user.id}>
+          <div key={user.id} className="py-2 first:pt-0 last:pb-0">
             <div className="flex gap-2 md:gap-4 items-center overflow-hidden">
               <Avatar src={user.name} />
               <div className="space-y-1 overflow-hidden">
