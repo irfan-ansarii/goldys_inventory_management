@@ -15,7 +15,7 @@ const TopCustomers = async ({
   const { data: totals } = await getOverview(interval);
   const { data } = await getCustomersOverview(interval);
 
-  const max = Math.max(...totals.map((t) => parseFloat(t.sale!)));
+  const max = totals.reduce((acc, curr) => (acc += parseFloat(curr.sale!)), 0);
 
   if (!data || data.length === 0) {
     return <EmptyState />;

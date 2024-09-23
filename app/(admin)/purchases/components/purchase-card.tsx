@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
 import Tooltip from "@/components/custom-ui/tooltip";
-import Avatar from "@/components/custom-ui/avatar";
+import Avatar, { AvatarGroup } from "@/components/custom-ui/avatar";
 import Actions from "./actions";
 
 const PurchaseCard = ({ purchase }: { purchase: PurchaseType }) => {
@@ -20,7 +20,9 @@ const PurchaseCard = ({ purchase }: { purchase: PurchaseType }) => {
       <CardContent className="p-4 md:p-6">
         <div className="grid grid-cols-5  gap-2 gap-y-4 sm:gap-4 items-center">
           <div className="flex gap-3 items-center col-span-3 md:col-span-1">
-            <span className="w-10 h-10 bg-lime-600 text-white rounded-md inline-flex items-center justify-center">
+            <span
+              className={`w-10 h-10 rounded-md inline-flex items-center justify-center ${className}`}
+            >
               <Inbox className="w-4 h-4" />
             </span>
             <div>
@@ -36,11 +38,19 @@ const PurchaseCard = ({ purchase }: { purchase: PurchaseType }) => {
             <p className="text-xs text-muted-foreground truncate">Supplier</p>
           </div>
 
-          <div className="flex -space-x-2 min-w-28 truncate col-span-3 md:col-span-1 md:order-2">
+          <AvatarGroup max={4} className="col-span-3 md:col-span-1">
             {purchase.lineItems.map((item) => (
-              <Avatar src={item.image || item.title!} key={item.id} />
+              <Avatar
+                key={item?.id}
+                src={item?.image}
+                title={`${item.title}${
+                  item.variantTitle?.toLowerCase() !== "default"
+                    ? ` - ${item.variantTitle}`
+                    : ""
+                }`}
+              />
             ))}
-          </div>
+          </AvatarGroup>
 
           <div className="ml-auto flex sm:gap-2 items-center col-span-2 md:col-span-1 order-4">
             <Tooltip

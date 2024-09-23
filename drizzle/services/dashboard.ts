@@ -6,13 +6,12 @@ import {
   countDistinct,
   desc,
   eq,
-  getTableColumns,
-  gte,
-  lte,
+  isNull,
   ne,
   notInArray,
   sql,
   sum,
+  or,
 } from "drizzle-orm";
 import { INTERVAL_MAP, IntervalKey } from "@/app/api/utils";
 import { lineItems, orders, shipments, transactions } from "../schemas/orders";
@@ -45,11 +44,14 @@ export const getOverview = async (interval: IntervalKey, storeId: any) => {
           sql`day + ${map.interval}::interval`
         ),
         eq(orders.storeId, storeId),
-        notInArray(orders.shipmentStatus, [
-          "cancelled",
-          "rto initiated",
-          "rto delivered",
-        ])
+        or(
+          isNull(orders.shipmentStatus),
+          notInArray(orders.shipmentStatus, [
+            "cancelled",
+            "rto initiated",
+            "rto delivered",
+          ])
+        )
       )
     )
     .leftJoin(

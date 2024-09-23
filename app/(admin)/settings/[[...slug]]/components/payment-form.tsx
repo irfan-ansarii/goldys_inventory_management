@@ -90,7 +90,9 @@ const PaymentForm = ({
                   <div className="flex flex-col md:w-44 [&>*]:justify-start">
                     <PaymentPopup
                       values={{ name: field.name, key: field.key }}
-                      onSubmit={(v) => orderFields.update(i, { ...v })}
+                      onSubmit={(v) => {
+                        orderFields.update(i, { ...v });
+                      }}
                     >
                       <Button variant="ghost" size="sm">
                         <Pencil className="w-4 h-4 mr-2" />
@@ -146,7 +148,7 @@ const PaymentForm = ({
                   <div className="flex flex-col md:w-44 [&>*]:justify-start">
                     <PaymentPopup
                       values={{ name: field.name, key: field.key }}
-                      onSubmit={(v) => orderFields.update(i, { ...v })}
+                      onSubmit={(v) => purchaseFields.update(i, { ...v })}
                     >
                       <Button variant="ghost" size="sm">
                         <Pencil className="w-4 h-4 mr-2" />

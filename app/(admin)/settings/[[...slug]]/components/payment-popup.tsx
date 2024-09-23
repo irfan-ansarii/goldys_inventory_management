@@ -42,7 +42,14 @@ const PaymentPopup = ({
   });
 
   const handleSubmit = (values: FormValues) => {
-    onSubmit(values);
+    const { name } = values;
+    const key = name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\-]+/g, "");
+
+    onSubmit({ ...values, key });
     setOpen(false);
     form.reset();
   };

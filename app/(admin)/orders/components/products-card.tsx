@@ -95,7 +95,7 @@ const ProductsCard = ({ calculateCart }: { calculateCart: () => void }) => {
             <Search className="w-4 h-4" />
           </span>
           <Input
-            placeholder="Search..."
+            placeholder="Scan | Search..."
             className="pl-10"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
