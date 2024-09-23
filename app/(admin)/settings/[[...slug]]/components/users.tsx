@@ -17,7 +17,7 @@ const UsersPage = async () => {
         <CardTitle className="text-lg">Users</CardTitle>
         <UserPopup
           defaultRoles={[
-            { label: "User", value: "User" },
+            { label: "User", value: "user" },
             { label: "Admin", value: "admin" },
           ]}
         >

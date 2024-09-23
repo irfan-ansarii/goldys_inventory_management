@@ -48,7 +48,7 @@ const UserActions = ({ user }: { user: UserType }) => {
               },
             }}
             defaultRoles={[
-              { label: "User", value: "User" },
+              { label: "User", value: "user" },
               { label: "Admin", value: "admin" },
             ]}
           >
