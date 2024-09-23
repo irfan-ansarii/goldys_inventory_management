@@ -308,12 +308,17 @@ const formatAddress = (args: any) => {
     country,
   } = args;
 
-  const address = `${first_name} ${last_name} ${address1} ${
+  const address = `${address1} ${
     address2 ? address2 : ""
   } ${city} ${province} - ${zip} ${country}`;
 
   const splitted = splitText(address);
-  return [...splitted, `Phone: ${phone}`, `Email: ${email}`];
+  return [
+    `${first_name} ${last_name}`,
+    ...splitted,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+  ];
 };
 
 const getChannelTransactions = async (
