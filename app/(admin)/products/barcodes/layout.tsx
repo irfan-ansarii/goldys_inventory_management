@@ -32,6 +32,7 @@ const types = [
 const BarcodesLayout = ({ children }: { children: React.ReactNode }) => {
   const { mutate, isPending } = useBulkPrintBarcode();
   const { queryParams, searchParamsObj } = useRouterStuff();
+
   const handlePrint = () => {
     const id = toast.loading("Please wait...", {
       duration: Infinity,

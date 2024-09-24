@@ -4,6 +4,8 @@ import { InferRequestType, InferResponseType } from "hono";
 import { useMutation } from "@tanstack/react-query";
 
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import { exportOrdersPDF } from "@/lib/export-odrers-pdf";
 
 export type OrderType = InferResponseType<
   (typeof client.api.orders)[":id"]["$get"]
@@ -140,6 +142,44 @@ export const useDeleteOrder = (id: any) => {
     },
     onSuccess: ({ data }) => toast.success(`Order ${data.name} deleted`),
     onError: (error) => toast.error(error.message),
+  });
+};
+
+type ExportRequestType = InferRequestType<
+  typeof client.api.orders.export.$post
+>;
+
+/** export  orders */
+export const useExportOrders = (query: Record<string, any>) => {
+  return useMutation<{ url: URL }, Error, ExportRequestType>({
+    mutationFn: async () => {
+      const response = await client.api.orders.export.$post({
+        query,
+      });
+
+      const jsonResponse = await response.json();
+
+      if (!jsonResponse.success) throw jsonResponse;
+
+      const doc = new jsPDF({
+        putOnlyUsedFonts: true,
+        orientation: "portrait",
+      });
+
+      const items = jsonResponse.data.map((item: any) => ({
+        ...item,
+        price: parseFloat(item.salePrice!).toFixed(2),
+      }));
+
+      await exportOrdersPDF(doc, items);
+
+      const url = doc.output("bloburi");
+      return { url };
+    },
+
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 };
 

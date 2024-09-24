@@ -6,12 +6,20 @@ import Popup from "@/components/custom-ui/popup";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
-import { Check, ChevronDown, ListFilter, PlusCircle } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Download,
+  ListFilter,
+  PlusCircle,
+} from "lucide-react";
 
 import SearchBar from "@/components/search-bar";
 
 import { useRouterStuff } from "@/hooks/use-router-stuff";
 import { getShipmentStatusBadgeClassNames } from "@/lib/utils";
+import { useExportOrders } from "@/query/orders";
+import { toast } from "sonner";
 
 const paymentStatus = [
   { label: "All", value: "" },
@@ -37,25 +45,50 @@ const shipmentStatus = [
 const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
   const { queryParams, searchParamsObj } = useRouterStuff();
 
+  const exportPdf = useExportOrders(searchParamsObj);
+
   const status = useMemo(() => {
     return shipmentStatus.find(
       (i) => i.value === (searchParamsObj.shipmentStatus || "")
     )?.label;
   }, [searchParamsObj.shipmentStatus]);
 
+  const handleExport = () => {
+    const id = toast.loading("Please wait...", {
+      duration: Infinity,
+    });
+    exportPdf.mutate(
+      {},
+      {
+        onSuccess: ({ url }) => {
+          toast.dismiss(id);
+
+          window.open(url, "_blank");
+        },
+        onError: () => console.log("error"),
+      }
+    );
+  };
+
   return (
     <>
-      <div className="mb-6 flex">
+      <div className="mb-6 flex flex-col md:flex-row">
         <div className="space-y-1">
           <CardTitle>Orders</CardTitle>
           <CardDescription>View and manage your orders.</CardDescription>
         </div>
-        <Link
-          href="/orders/new"
-          className={buttonVariants({ className: "ml-auto min-w-48" })}
-        >
-          <PlusCircle className="w-4 h-4 mr-2" /> Add Order
-        </Link>
+        <div className="sm:ml-auto mt-3 sm:mt-0 [&>*]:flex-1 flex gap-2 ">
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Link
+            href="/orders/new"
+            className={buttonVariants({ className: "ml-auto min-w-48" })}
+          >
+            <PlusCircle className="w-4 h-4 mr-2" /> Add Order
+          </Link>
+        </div>
       </div>
 
       <div className="gap-1 mb-6 bg-secondary rounded-md p-1 hidden md:flex">

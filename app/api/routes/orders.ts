@@ -421,7 +421,30 @@ const app = new Hono()
 
     return c.json({ data: res, success: true }, 200);
   })
+  /********************************************************************* */
+  /**                            EXPORT ORDERS                           */
+  /********************************************************************* */
+  .post("/export", async (c) => {
+    const { storeId } = c.get("jwtPayload");
 
+    const { shipmentStatus = "processing" } = c.req.query();
+
+    let page: number | null = 1;
+    let res = [];
+
+    while (page !== null) {
+      const { data, meta } = await getOrders({ shipmentStatus, storeId, page });
+
+      res.push(...data);
+      console.log(meta);
+      if (meta.page === meta.pages) {
+        page = null;
+      } else {
+        page++;
+      }
+    }
+    return c.json({ data: res, success: true }, 200);
+  })
   /********************************************************************* */
   /**                         GET ORDER INVOICE                          */
   /********************************************************************* */

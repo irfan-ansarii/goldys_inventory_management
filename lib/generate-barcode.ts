@@ -137,7 +137,7 @@ export const generateBarcode = async (
     const temp: (typeof item)[] = Array(item.quantity).fill(item);
     list.splice(i, 0, ...temp);
   });
-  console.log(list);
+
   for (let j = 0; j < list.length; j += columns) {
     if (j > 0) {
       doc.addPage();
