@@ -81,6 +81,7 @@ const BarcodePopup = ({
       barcode: item.barcode!,
       image: item?.product?.image,
       value: item.id!,
+      stock: item.stock,
     }));
   };
 
@@ -116,6 +117,7 @@ const BarcodePopup = ({
         { lineItems },
         {
           onSuccess: ({ url }) => {
+            form.reset();
             window.open(url, "_blank");
             setOpen(false);
           },
@@ -129,6 +131,7 @@ const BarcodePopup = ({
       {
         onSuccess: () => {
           router.refresh();
+          form.reset();
           setOpen(false);
         },
       }
@@ -143,9 +146,9 @@ const BarcodePopup = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="p-2 md:p-6 flex flex-col"
+            className="p-2 md:p-6 flex flex-col gap-4"
           >
-            <DialogTitle className="mb-6">
+            <DialogTitle>
               {action === "print"
                 ? "Print barcode"
                 : "Add Product to Print List"}
@@ -180,16 +183,19 @@ const BarcodePopup = ({
                     isFocused && "bg-accent/70 text-accent-foreground"
                   ),
               }}
-              formatOptionLabel={({ title, variantTitle, image }) => (
+              // @ts-ignore
+              formatOptionLabel={({ title, variantTitle, image, stock }) => (
                 <>
                   <Avatar src={image || title} className="mr-2" />
-
                   <div className="space-y-0.5">
                     <p className="text-sm">{title}</p>
                     <Badge variant="secondary" className="py-0">
                       {variantTitle}
                     </Badge>
                   </div>
+                  <Badge className="ml-auto py-0" variant="secondary">
+                    {stock}
+                  </Badge>
                 </>
               )}
             />
@@ -203,10 +209,7 @@ const BarcodePopup = ({
               ) : null}
 
               {fields.map((field, i) => (
-                <div
-                  className="py-2 grid grid-cols-3 gap-2 first:mt-4"
-                  key={field.id}
-                >
+                <div className="py-2 grid grid-cols-3 gap-2" key={field.id}>
                   <div className="flex items-start gap-2 col-span-2 overflow-hidden">
                     <Avatar
                       src={field.image || field.title!}
