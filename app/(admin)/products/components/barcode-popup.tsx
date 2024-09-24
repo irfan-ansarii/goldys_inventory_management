@@ -33,6 +33,7 @@ const schema = z.object({
         .refine((arg) => !isNaN(parseInt(arg)), { message: "Invalid value" }),
       value: z.number(),
       image: z.string().nullable(),
+      stock: z.any(),
     })
     .array()
     .min(1),
@@ -88,9 +89,8 @@ const BarcodePopup = ({
   const handleSelect = (selected: Selected | null) => {
     if (!selected) return;
     const index = fields.findIndex((field) => field.value === selected.value);
-    if (index == -1) append({ ...selected, quantity: "1" });
+    if (index == -1) append({ ...selected, quantity: selected.stock });
     else {
-      const q = form.watch(`lineItems.${index}.quantity`);
       update(index, {
         productId: selected.productId,
         variantId: selected.variantId,
@@ -99,7 +99,7 @@ const BarcodePopup = ({
         barcode: selected.barcode,
         image: selected.image,
         value: selected.value,
-        quantity: (parseInt(q) + 1).toString(),
+        quantity: selected.quantity,
       });
     }
     setValue(null);
@@ -183,7 +183,6 @@ const BarcodePopup = ({
                     isFocused && "bg-accent/70 text-accent-foreground"
                   ),
               }}
-              // @ts-ignore
               formatOptionLabel={({ title, variantTitle, image, stock }) => (
                 <>
                   <Avatar src={image || title} className="mr-2" />

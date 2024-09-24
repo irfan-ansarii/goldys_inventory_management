@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 import { ProductType, useDeleteProduct } from "@/query/products";
 
 import { Box, EllipsisVertical, Pencil, Printer } from "lucide-react";
@@ -19,7 +20,7 @@ const Actions = ({ product }: { product: ProductType }) => {
 
   const router = useRouter();
   const remove = useDeleteProduct(product.id);
-
+  const { data: session } = useAuth();
   const onRemove = () => {
     remove.mutate(undefined, {
       onSuccess: () => {
@@ -28,6 +29,29 @@ const Actions = ({ product }: { product: ProductType }) => {
       },
     });
   };
+
+  const barcodes = useMemo(() => {
+    const storeInventories =
+      product.inventories.find((inv) => inv.storeId === session?.storeId)
+        ?.products || [];
+
+    return product.variants.map((variant) => {
+      const foundProduct = storeInventories.find(
+        (inv: any) => inv.title.toLowerCase() === variant.title.toLowerCase()
+      );
+
+      return {
+        productId: variant.productId,
+        variantId: variant.id,
+        title: product.title,
+        variantTitle: variant.title,
+        barcode: variant.barcode!,
+        image: product.image,
+        value: parseFloat(variant.salePrice),
+        quantity: foundProduct?.stock || "0",
+      };
+    });
+  }, [session, product.variants, product.inventories]);
 
   return (
     <Popup
@@ -62,19 +86,7 @@ const Actions = ({ product }: { product: ProductType }) => {
                 </Button>
               </Popup>
             )}
-            <BarcodePopup
-              defaultValues={product.variants.map((item) => ({
-                productId: item.productId,
-                variantId: item.id,
-                title: product.title,
-                variantTitle: item.title,
-                barcode: item.barcode!,
-                image: product.image,
-                value: parseFloat(item.salePrice),
-                quantity: (1).toString(),
-              }))}
-              action="print"
-            >
+            <BarcodePopup defaultValues={barcodes} action="print">
               <Button variant="ghost" size="sm">
                 <Printer className="w-4 h-4 mr-2" />
                 Print Barcode

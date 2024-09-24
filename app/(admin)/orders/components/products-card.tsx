@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { OrderFormValues } from "./form";
 import { useFormContext } from "react-hook-form";
@@ -17,6 +17,7 @@ import Tooltip from "@/components/custom-ui/tooltip";
 const ProductsCard = ({ calculateCart }: { calculateCart: () => void }) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const { data, isLoading, isError } = useGetVariants({ q: search, page });
 
@@ -86,6 +87,12 @@ const ProductsCard = ({ calculateCart }: { calculateCart: () => void }) => {
     calculateCart();
     setSearch("");
   };
+
+  useEffect(() => {
+    console.log("focusing");
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <>
       {/* search bar */}
@@ -95,6 +102,7 @@ const ProductsCard = ({ calculateCart }: { calculateCart: () => void }) => {
             <Search className="w-4 h-4" />
           </span>
           <Input
+            ref={inputRef}
             placeholder="Scan | Search..."
             className="pl-10"
             value={search}
