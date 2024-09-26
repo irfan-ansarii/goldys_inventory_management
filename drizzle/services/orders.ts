@@ -168,8 +168,8 @@ export const getOrder = async (id: any, params?: Record<string, any>) => {
       soldBy: {
         id: employee.id,
         name: employee.name,
-        phone: users.phone,
-        email: users.email,
+        phone: employee.phone,
+        email: employee.email,
       },
       soldTo: {
         id: users.id,

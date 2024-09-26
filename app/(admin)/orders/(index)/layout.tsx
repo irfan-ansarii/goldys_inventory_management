@@ -78,7 +78,7 @@ const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
           <CardDescription>View and manage your orders.</CardDescription>
         </div>
         <div className="sm:ml-auto mt-3 sm:mt-0 [&>*]:flex-1 flex gap-2 ">
-          <Button variant="outline" onClick={handleExport}>
+          <Button variant="outline" onClick={handleExport} disabled>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -165,7 +165,7 @@ const OrdersLayout = ({ children }: { children: React.ReactNode }) => {
 
         <Popup
           content={
-            <div className="md:w-52 flex flex-col [&>*]:justify-start">
+            <div className="md:w-44 gap-1 flex flex-col [&>*]:justify-start">
               {shipmentStatus.map((path) => (
                 <Link
                   key={path.value}

@@ -47,7 +47,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Popup
           variant="popover"
           content={
-            <div className="flex flex-col md:w-44">
+            <div className="flex flex-col md:w-44 gap-1">
               {durations.map((duration) => (
                 <Link
                   key={duration.value}

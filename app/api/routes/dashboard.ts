@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Hono } from "hono";
 
-import { INTERVAL_MAP, IntervalKey } from "../utils";
+import { getZonedTime, INTERVAL_MAP, IntervalKey } from "../utils";
 import { validator } from "../utils";
 import {
   getAdjustmentsOverview,
@@ -20,6 +20,7 @@ const intervalKeys = Object.keys(INTERVAL_MAP) as Array<IntervalKey>;
 
 const intervalSchema = z.object({
   interval: z.enum(intervalKeys as [IntervalKey, ...IntervalKey[]]),
+  timeZone: z.string().optional(),
 });
 
 const app = new Hono()
@@ -28,10 +29,12 @@ const app = new Hono()
   /**                            GET OVERVIEW                            */
   /********************************************************************* */
   .get("/overview", validator("query", intervalSchema), async (c) => {
-    const { id, storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { storeId } = c.get("jwtPayload");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -41,9 +44,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/transactions", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getTransactionsOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getTransactionsOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -55,9 +60,14 @@ const app = new Hono()
     validator("query", intervalSchema),
     async (c) => {
       const { storeId } = c.get("jwtPayload");
-      const { interval } = c.req.valid("query");
+      const { interval, timeZone } = c.req.valid("query");
 
-      const response = await getPurchaseTransactionsOverview(interval, storeId);
+      const intervalMap = getZonedTime(interval, timeZone);
+
+      const response = await getPurchaseTransactionsOverview(
+        storeId,
+        intervalMap
+      );
 
       return c.json({ success: true, data: response }, 200);
     }
@@ -67,9 +77,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/expenses", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getExpensesOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getExpensesOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -78,9 +90,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/employee", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getEmployeesOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getEmployeesOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -89,9 +103,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/customer", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getCustomersOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getCustomersOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -100,9 +116,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/products", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getProductsOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getProductsOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -111,9 +129,11 @@ const app = new Hono()
   /********************************************************************* */
   .get("/adjustments", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const response = await getAdjustmentsOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const response = await getAdjustmentsOverview(storeId, intervalMap);
 
     return c.json({ success: true, data: response }, 200);
   })
@@ -122,9 +142,14 @@ const app = new Hono()
   /********************************************************************* */
   .get("/shipments", validator("query", intervalSchema), async (c) => {
     const { storeId } = c.get("jwtPayload");
-    const { interval } = c.req.valid("query");
+    const { interval, timeZone } = c.req.valid("query");
 
-    const { shipment, pending } = await getShipmentsOverview(interval, storeId);
+    const intervalMap = getZonedTime(interval, timeZone);
+
+    const { shipment, pending } = await getShipmentsOverview(
+      storeId,
+      intervalMap
+    );
 
     let delayed = 0;
     let processing = 0;

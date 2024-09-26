@@ -13,15 +13,15 @@ import {
   sum,
   or,
 } from "drizzle-orm";
-import { INTERVAL_MAP, IntervalKey } from "@/app/api/utils";
+import { IntervalMap } from "@/app/api/utils";
 import { lineItems, orders, shipments, transactions } from "../schemas/orders";
 import { purchase, purchaseTransactions } from "../schemas/purchase";
 import { expenses } from "../schemas/expenses";
 import { users } from "../schemas/users";
 import { adjustments, products } from "../schemas/products";
 
-export const getOverview = async (interval: IntervalKey, storeId: any) => {
-  const map = INTERVAL_MAP[interval];
+export const getOverview = async (storeId: any, intervalMap: IntervalMap) => {
+  const { start, end, interval } = intervalMap;
 
   return await db
     .select({
@@ -31,18 +31,14 @@ export const getOverview = async (interval: IntervalKey, storeId: any) => {
     })
     .from(
       sql`generate_series(
-          ${map.start}::timestamptz,
-          ${map.end}::timestamptz,
-          ${map.interval}::interval) as day`
+          ${start}::timestamptz,
+          ${end}::timestamptz,
+          ${interval}::interval) as day`
     )
     .leftJoin(
       orders,
       and(
-        between(
-          orders.createdAt,
-          sql`day`,
-          sql`day + ${map.interval}::interval`
-        ),
+        between(orders.createdAt, sql`day`, sql`day + ${interval}::interval`),
         eq(orders.storeId, storeId),
         or(
           isNull(orders.shipmentStatus),
@@ -57,11 +53,7 @@ export const getOverview = async (interval: IntervalKey, storeId: any) => {
     .leftJoin(
       purchase,
       and(
-        between(
-          purchase.createdAt,
-          sql`day`,
-          sql`day + ${map.interval}::interval`
-        ),
+        between(purchase.createdAt, sql`day`, sql`day + ${interval}::interval`),
         eq(purchase.storeId, storeId)
       )
     )
@@ -70,16 +62,16 @@ export const getOverview = async (interval: IntervalKey, storeId: any) => {
 };
 
 export const getTransactionsOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       transactions.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(transactions.storeId, storeId)
   );
@@ -96,16 +88,16 @@ export const getTransactionsOverview = async (
 };
 
 export const getPurchaseTransactionsOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       purchaseTransactions.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(purchaseTransactions.storeId, storeId)
   );
@@ -122,16 +114,16 @@ export const getPurchaseTransactionsOverview = async (
 };
 
 export const getExpensesOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       expenses.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(expenses.storeId, storeId)
   );
@@ -147,16 +139,15 @@ export const getExpensesOverview = async (
 };
 
 export const getEmployeesOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
-
+  const { start, end, interval } = intervalMap;
   const filters = and(
     between(
       orders.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(orders.storeId, storeId)
   );
@@ -174,16 +165,16 @@ export const getEmployeesOverview = async (
 };
 
 export const getCustomersOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       orders.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(orders.storeId, storeId)
   );
@@ -205,16 +196,16 @@ export const getCustomersOverview = async (
 };
 
 export const getProductsOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       orders.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(orders.storeId, storeId)
   );
@@ -236,16 +227,16 @@ export const getProductsOverview = async (
 };
 
 export const getAdjustmentsOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       adjustments.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(adjustments.storeId, storeId)
   );
@@ -261,16 +252,16 @@ export const getAdjustmentsOverview = async (
 };
 
 export const getShipmentsOverview = async (
-  interval: IntervalKey,
-  storeId: any
+  storeId: any,
+  intervalMap: IntervalMap
 ) => {
-  const map = INTERVAL_MAP[interval];
+  const { start, end, interval } = intervalMap;
 
   const filters = and(
     between(
       orders.createdAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(orders.storeId, storeId)
   );
@@ -278,8 +269,8 @@ export const getShipmentsOverview = async (
   const filtersShipment = and(
     between(
       shipments.updatedAt,
-      sql`${map.start}::timestamptz`,
-      sql`${map.end}::timestamptz`
+      sql`${start}::timestamptz`,
+      sql`${end}::timestamptz`
     ),
     eq(shipments.storeId, storeId),
     ne(shipments.status, "cancelled")

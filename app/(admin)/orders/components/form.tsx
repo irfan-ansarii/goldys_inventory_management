@@ -53,14 +53,7 @@ const schema = orderCreateSchema
       reason: z.any(),
       amount: z.any(),
     }),
-    discountLines: z
-      .object({
-        type: z.string(),
-        reason: z.string(),
-        amount: z.string(),
-      })
-      .optional()
-      .nullable(),
+
     taxKind: z.object({
       type: z.string(),
       saleType: z.string(),
@@ -96,7 +89,6 @@ const OrderForm = ({ defaultValues }: any) => {
       : {
           lineItems: [],
           transactions: [],
-          discountLines: { type: "fixed", reason: "", amount: "" },
           taxKind: {
             type: "included",
             saleType: "state",
@@ -109,9 +101,6 @@ const OrderForm = ({ defaultValues }: any) => {
   const watchValues = useWatch<OrderFormValues>({
     control,
     name: [
-      "discountLines.type",
-      "discountLines.reason",
-      "discountLines.amount",
       "taxKind.type",
       "taxKind.saleType",
       "charges.reason",
@@ -131,8 +120,7 @@ const OrderForm = ({ defaultValues }: any) => {
   const calculateCart = () => {
     const cartLineItems = getValues("lineItems");
 
-    const [dType, dReason, dAmount, tType, sType, cReason, cAmount] =
-      watchValues as WatchProps;
+    const [tType, sType, cReason, cAmount] = watchValues as WatchProps;
 
     // update the line items and return the calculated cart total
     const totals = cartLineItems.reduce(

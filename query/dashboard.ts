@@ -12,10 +12,13 @@ export type ExpensesOverviewType = InferResponseType<
   typeof client.api.dashboard.expenses.$get
 >;
 
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 export const getOverview = async (interval: string) => {
   const client = await getClient();
+  console.log(timeZone);
   const response = await client.api.dashboard.overview.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -28,7 +31,7 @@ export const getOverview = async (interval: string) => {
 export const getTransactionsOverview = async (interval: string) => {
   const client = await getClient();
   const response = await client.api.dashboard.transactions.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -40,7 +43,7 @@ export const getTransactionsOverview = async (interval: string) => {
 export const getPurchaseTransactionsOverview = async (interval: string) => {
   const client = await getClient();
   const response = await client.api.dashboard["purchase-transactions"].$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -53,7 +56,7 @@ export const getPurchaseTransactionsOverview = async (interval: string) => {
 export const getExpensesOverview = async (interval: string) => {
   const client = await getClient();
   const response = await client.api.dashboard.expenses.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -66,7 +69,7 @@ export const getExpensesOverview = async (interval: string) => {
 export const getEmployeesOverview = async (interval: string) => {
   const client = await getClient();
   const response = await client.api.dashboard.employee.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -78,7 +81,7 @@ export const getEmployeesOverview = async (interval: string) => {
 export const getCustomersOverview = async (interval: string) => {
   const client = await getClient();
   const response = await client.api.dashboard.customer.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -91,7 +94,7 @@ export const getCustomersOverview = async (interval: string) => {
 export const getProductsOverview = async (interval: string) => {
   const client = await getClient();
   const response = await client.api.dashboard.products.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -104,7 +107,7 @@ export const getAdjustmentsOverview = async (interval: string) => {
   const client = await getClient();
 
   const response = await client.api.dashboard.adjustments.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 
@@ -113,11 +116,12 @@ export const getAdjustmentsOverview = async (interval: string) => {
   }
   return result;
 };
+
 export const getShipmentsOverview = async (interval: string) => {
   const client = await getClient();
 
   const response = await client.api.dashboard.shipments.$get({
-    query: { interval },
+    query: { interval, timeZone },
   });
   const result = await response.json();
 

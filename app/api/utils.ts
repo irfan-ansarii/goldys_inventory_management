@@ -4,6 +4,8 @@ import { getInventories, updateInventory } from "@/drizzle/services/products";
 import { getPurchaseTransactions } from "@/drizzle/services/purchase";
 import { zValidator } from "@hono/zod-validator";
 import { endOfDay, startOfDay, subDays, subMonths } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
+
 import type { ValidationTargets } from "hono";
 import jsPDF from "jspdf";
 import type { ZodSchema } from "zod";
@@ -35,12 +37,6 @@ export const validator = <
     }
   });
 };
-
-console.log(
-  Intl.DateTimeFormat().resolvedOptions().timeZone,
-  startOfDay(new Date()),
-  endOfDay(new Date())
-);
 
 export const INTERVAL_MAP = {
   today: {
@@ -75,6 +71,25 @@ export const INTERVAL_MAP = {
   },
 };
 export type IntervalKey = keyof typeof INTERVAL_MAP;
+
+export const getZonedTime = (
+  intervalKey: IntervalKey,
+  timeZone: string = "UTC"
+) => {
+  const { start, end, interval } = INTERVAL_MAP[intervalKey];
+
+  const zonedStart = toZonedTime(start, timeZone);
+  const zonedEnd = toZonedTime(end, timeZone);
+
+  return {
+    start: zonedStart,
+    end: zonedEnd,
+    interval,
+  };
+};
+
+export type IntervalMap = ReturnType<typeof getZonedTime>;
+
 export const PAGE_LIMIT = 20;
 
 export const sanitizeOutput = <T extends SanitizeProps>(

@@ -171,7 +171,7 @@ export const useExportOrders = (query: Record<string, any>) => {
         price: parseFloat(item.salePrice!).toFixed(2),
       }));
 
-      await exportOrdersPDF(doc, items);
+      // await exportOrdersPDF(doc, items);
 
       const url = doc.output("bloburi");
       return { url };
