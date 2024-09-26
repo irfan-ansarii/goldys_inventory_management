@@ -16,7 +16,10 @@ const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export const getOverview = async (interval: string) => {
   const client = await getClient();
-  console.log(timeZone);
+  console.log("glolab timezone::", timeZone);
+
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log("timezone generated in getOvervide()::", tz);
   const response = await client.api.dashboard.overview.$get({
     query: { interval, timeZone },
   });

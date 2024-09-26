@@ -28,6 +28,8 @@ const DashboardPage = async ({
 }: {
   searchParams: { [k: string]: string };
 }) => {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log("page timezone::", tz);
   return (
     <div className="grid grid-cols-6 gap-4 md:gap-6 [&>div]:relative">
       <div className="col-span-6 md:col-span-4 grid grid-cols-6 gap-4 md:gap-6 [&>div]:relative">
