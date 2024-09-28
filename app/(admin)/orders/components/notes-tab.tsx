@@ -161,17 +161,18 @@ const NotesTab = ({ onPrev, onNext }: Props) => {
           )}
         />
 
-        <div className="flex items-center justify-between px-3 py-2 border rounded-lg h-10">
-          <Label htmlFor="shipping" className="leading-none font-normal ">
-            Require Shipping
-          </Label>
-          <Switch
-            id="shipping"
-            defaultChecked={false}
-            onCheckedChange={onCheckedChange}
-          />
-        </div>
-
+        {!orderId && (
+          <div className="flex items-center justify-between px-3 py-2 border rounded-lg h-10">
+            <Label htmlFor="shipping" className="leading-none font-normal ">
+              Require Shipping
+            </Label>
+            <Switch
+              id="shipping"
+              defaultChecked={false}
+              onCheckedChange={onCheckedChange}
+            />
+          </div>
+        )}
         <FormField
           control={form.control}
           name="notes"

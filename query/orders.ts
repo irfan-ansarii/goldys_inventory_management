@@ -145,6 +145,25 @@ export const useDeleteOrder = (id: any) => {
   });
 };
 
+/** cancel order */
+export const useCancelOrder = (id: any) => {
+  return useMutation<DeleteResponseType, Error>({
+    mutationFn: async () => {
+      const response = await client.api.orders[":id"]["cancel"].$post({
+        param: {
+          id,
+        },
+      });
+
+      const jsonResponse = await response.json();
+      if (!jsonResponse.success) throw jsonResponse;
+      return jsonResponse;
+    },
+    onSuccess: ({ data }) => toast.success(`Order ${data.name} cancelled`),
+    onError: (error) => toast.error(error.message),
+  });
+};
+
 type ExportRequestType = InferRequestType<
   typeof client.api.orders.export.$post
 >;
@@ -250,7 +269,7 @@ export const useProcessOrder = (id: string) => {
       if (!jsonResponse.success) throw jsonResponse;
       return jsonResponse;
     },
-    onSuccess: () => toast.success("Order processed"),
+    onSuccess: () => toast.success("Order shipped"),
     onError: (error) => toast.error(error.message),
   });
 };

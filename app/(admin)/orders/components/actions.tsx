@@ -3,7 +3,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { OrderType, useDeleteOrder, useInvoiceAction } from "@/query/orders";
+import {
+  OrderType,
+  useCancelOrder,
+  useDeleteOrder,
+  useInvoiceAction,
+} from "@/query/orders";
 
 import {
   CircleX,
@@ -33,6 +38,7 @@ const Actions = ({ order, type }: { order: OrderType; type?: string }) => {
 
   const { data: session } = useSession();
   const remove = useDeleteOrder(order.id);
+  const cancel = useCancelOrder(order.id);
   const invoice = useInvoiceAction(String(order.id));
 
   // handle duplicate order
@@ -52,7 +58,7 @@ const Actions = ({ order, type }: { order: OrderType; type?: string }) => {
 
   // handle cancel order
   const handleCancel = () => {
-    remove.mutate(undefined, {
+    cancel.mutate(undefined, {
       onSuccess: () => {
         setOpen(false);
         router.refresh();
